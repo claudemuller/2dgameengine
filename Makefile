@@ -1,5 +1,5 @@
 CC=g++
-FLAGS=-Wall -D_THREAD_SAFE
+FLAGS=-Wall -std=c++17 -D_THREAD_SAFE
 INCS=-I/opt/homebrew/include -I/opt/homebrew/include/SDL2
 LIBS=-L/opt/homebrew/lib -lSDL2
 SRC=./src/*.cpp
