@@ -1,7 +1,7 @@
 CC=g++
 FLAGS=-Wall -std=c++17 -D_THREAD_SAFE
-INCS=-I/opt/homebrew/include -I/opt/homebrew/include/SDL2
-LIBS=-L/opt/homebrew/lib -lSDL2 -llua
+INCS=-I/opt/homebrew/include -I./libs/ -I./libs/lua/
+LIBS=-L/opt/homebrew/lib -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua
 SRC=./src/*.cpp
 BIN=gameengine
 
