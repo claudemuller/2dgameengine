@@ -20,6 +20,9 @@ public:
 	void update();
 	void render();
 	void cleanup();
+
+	int windowWidth;
+	int windowHeight;
 };
 
 #endif // GAME_H
