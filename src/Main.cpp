@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
 	Game game;
 
-	game.setup();
+	game.init();
 	game.run();
 	game.cleanup();
 

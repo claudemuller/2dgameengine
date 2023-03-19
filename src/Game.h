@@ -14,8 +14,9 @@ public:
 	Game();
 	~Game();
 
-	void setup();
+	void init();
 	void run();
+	void setup();
 	void processInput();
 	void update();
 	void render();
