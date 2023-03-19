@@ -4,9 +4,9 @@
 int main(int argc, char* argv[]) {
 	Game game;
 
-	game.init();
-	game.run();
-	game.cleanup();
+	game.Init();
+	game.Run();
+	game.Cleanup();
 
 
 	return 0;

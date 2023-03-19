@@ -11,7 +11,7 @@ Game::~Game() {
 
 }
 
-void Game::init() {
+void Game::Init() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		std::cerr << "error initing SDL" << std::endl;
 		return;
@@ -19,15 +19,15 @@ void Game::init() {
 
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(1, &displayMode);
-	windowWidth = 800; //displayMode.w;
-	windowHeight = 600; //displayMode.h;
+	WindowWidth = 800; //displayMode.w;
+	WindowHeight = 600; //displayMode.h;
 
 	window = SDL_CreateWindow(
 			NULL,
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
-			windowWidth,
-			windowHeight,
+			WindowWidth,
+			WindowHeight,
 			SDL_WINDOW_BORDERLESS
 	);
 	if (window == nullptr) {
@@ -45,25 +45,25 @@ void Game::init() {
 	isRunning = true;
 }
 
-void Game::run() {
-	setup();
+void Game::Run() {
+	Setup();
 
 	while (isRunning) {
-		processInput();
-		update();
-		render();
+		ProcessInput();
+		Update();
+		Render();
 	}
 }
 
 glm::vec2 playerPos;
 glm::vec2 playerVelocity;
 
-void Game::setup() {
+void Game::Setup() {
 	playerPos = glm::vec2(10.0, 20.0);
 	playerVelocity = glm::vec2(1.0, 0.0);
 }
 
-void Game::processInput() {
+void Game::ProcessInput() {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
@@ -79,11 +79,16 @@ void Game::processInput() {
 	}
 }
 
-void Game::update() {
+void Game::Update() {
+	int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecsPreviousFrame);
+	if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) SDL_Delay(timeToWait);
+
+	millisecsPreviousFrame = SDL_GetTicks();
+
 	playerPos += playerVelocity;
 }
 
-void Game::render() {
+void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
 	SDL_RenderClear(renderer);
 
@@ -103,7 +108,7 @@ void Game::render() {
 	SDL_RenderPresent(renderer);
 }
 
-void Game::cleanup() {
+void Game::Cleanup() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
