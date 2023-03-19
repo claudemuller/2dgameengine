@@ -1,9 +1,9 @@
 CC=g++
 FLAGS=-Wall -std=c++17 -D_THREAD_SAFE
 INCS=-I/opt/homebrew/include -I/opt/homebrew/include/SDL2
-LIBS=-L/opt/homebrew/lib -lSDL2
+LIBS=-L/opt/homebrew/lib -lSDL2 -llua
 SRC=./src/*.cpp
-BIN=game
+BIN=gameengine
 
 all: clean build run
 
@@ -17,4 +17,4 @@ run:
 	./$(BIN)
 
 clean:
-	rm -rf $(BIN)
+	rm -rf $(BIN) debug
