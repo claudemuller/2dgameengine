@@ -6,11 +6,9 @@
 
 Game::Game() {
 	isRunning = false;
-	Logger::Log("game created");
 }
 
 Game::~Game() {
-	Logger::Err("game ended");
 }
 
 void Game::Init() {
@@ -45,6 +43,8 @@ void Game::Init() {
 
 	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 	isRunning = true;
+
+	Logger::Info("game successfully initialised");
 }
 
 void Game::Run() {
