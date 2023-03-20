@@ -2,18 +2,20 @@
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
 #include "Game.h"
+#include "Logger.h"
 
 Game::Game() {
 	isRunning = false;
+	Logger::Log("game created");
 }
 
 Game::~Game() {
-
+	Logger::Err("game ended");
 }
 
 void Game::Init() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		std::cerr << "error initing SDL" << std::endl;
+		Logger::Err("error initing SDL");
 		return;
 	}
 
@@ -31,13 +33,13 @@ void Game::Init() {
 			SDL_WINDOW_BORDERLESS
 	);
 	if (window == nullptr) {
-		std::cerr << "error creating window" << std::endl;
+		Logger::Err("error creating window");
 		return;
 	}
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == nullptr) {
-		std::cerr << "error creating renderer" << std::endl;
+		Logger::Err("error creating renderer");
 		return;
 	}
 
