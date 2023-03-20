@@ -1,17 +1,18 @@
 CC=g++
-FLAGS=-Wall -std=c++17 -D_THREAD_SAFE
+CFLAGS=-Wall -Wfatal-errors -std=c++17
 INCS=-I/opt/homebrew/include -I./libs/ -I./libs/lua/
-LIBS=-L/opt/homebrew/lib -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua
-SRC=./src/*.cpp
+LIBS=-L/opt/homebrew/lib
+LFLAGS=-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua
+SRC=./src/*.cpp ./src/**/*.cpp
 BIN=gameengine
 
 all: clean build run
 
 build:
-	$(CC) $(SRC) $(FLAGS) $(INCS) $(LIBS) -o $(BIN)
+	$(CC) $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -o $(BIN)
 
 debug:
-	$(CC) -g $(SRC) $(FLAGS) $(INCS) $(LIBS) -o debug
+	$(CC) -g $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -o debug
 
 run:
 	./$(BIN)
