@@ -15,7 +15,7 @@ private:
 	bool isRunning;
 	int millisecsPreviousFrame;
 
-	EntityManager *entityManager;
+	std::unique_ptr<EntityManager> entityManager;
 
 public:
 	Game();

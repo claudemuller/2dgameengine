@@ -4,10 +4,12 @@
 #include "Game.h"
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
+#include "../Components/TransformComponent.h"
+#include "../Components/RigidBodyComponent.h"
 
 Game::Game() {
 	isRunning = false;
-	entityManager = new EntityManager();
+	entityManager = std::make_unique<EntityManager>();
 }
 
 Game::~Game() {
@@ -61,7 +63,9 @@ void Game::Run() {
 
 void Game::Setup() {
 	Entity tank = entityManager->CreatEntity();
-	Entity truck = entityManager->CreatEntity();
+
+	entityManager->AddComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(0.0, 0.0), 0.0);
+	entityManager->AddComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
 }
 
 void Game::ProcessInput() {

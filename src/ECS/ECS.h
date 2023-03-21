@@ -8,6 +8,7 @@
 #include <set>
 #include <memory>
 #include <algorithm>
+#include "../Logger/Logger.h"
 
 const unsigned int MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
@@ -19,6 +20,7 @@ protected:
 
 template <typename T>
 class Component: public BaseComponent {
+public:
 	static int GetId() {
 		static auto id = nextId++;
 		return id;
@@ -110,9 +112,9 @@ public:
 class EntityManager {
 private:
 	int numEntities = 0;
-	std::vector<PoolBase*> componentPools;
+	std::vector<std::shared_ptr<PoolBase>> componentPools;
 	std::vector<Signature> entityComponentSignatures;
-	std::unordered_map<std::type_index, System*> systems;
+	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 	std::set<Entity> entitiesToBeAdded;
 	std::set<Entity> entitiesToBeKilled;
 
@@ -144,7 +146,7 @@ void System::RequireComponent() {
 
 template <typename T, typename ...TArgs>
 void EntityManager::AddEntityToSystem(Entity entity, TArgs&& ...args) {
-	T* newSystem(new T(std::forward<TArgs>(args)...));
+	std::shared_ptr<T> newSystem = std::make_shared<T>(std::forward<TArgs>(args)...);
 	systems.insert(std::make_pair(std::type_index(typeid(T)), newSystem));
 }
 
@@ -175,11 +177,11 @@ void EntityManager::AddComponent(Entity entity, TArgs&& ...args) {
 	}
 
 	if (!componentPools[componentId]) {
-		Pool<T>* newComponentPool = new Pool<T>();
+		std::shared_ptr<Pool<T>> newComponentPool = std::make_shared<Pool<T>>();
 		componentPools[componentId] = newComponentPool;
 	}
 
-	Pool<T>* componentPool = componentPools[componentId];
+	std::shared_ptr<Pool<T>> componentPool = std::static_pointer_cast<Pool<T>>(componentPools[componentId]);
 
 	if (entityId >= componentPool->GetSize()) {
 		componentPool->Resize(numEntities);
@@ -189,6 +191,8 @@ void EntityManager::AddComponent(Entity entity, TArgs&& ...args) {
 
 	componentPool->Set(entityId, newComponent);
 	entityComponentSignatures[entityId].set(componentId);
+
+	Logger::Info("component id = " + std::to_string(componentId) + " was added to entity id = " + std::to_string(entityId));
 }
 
 template <typename T>
