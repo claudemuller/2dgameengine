@@ -124,21 +124,41 @@ public:
 	template <typename T> bool HasComponent(Entity entity) const;
 	template <typename T> T& GetComponent(Entity entity) const;
 
-	void AddEntityToSystem(Entity entity);
+	template <typename T, typename ...TArgs> void AddEntityToSystem(Entity entity, TArgs&& ...args);
+	template <typename T> void RemoveSystem();
+	template <typename T> bool HasSystem() const;
+	template <typename T> T& GetSystem() const;
 
-	// Entity GetComponent(Entity entity) const;
-	// bool HasComponenent(Entity entity) const;
-
-	// AddSystem()
-	// RemoveSystem()
-	// HasSystem()
-	// GetSystem()
+	void AddEntityToSystems(Entity entity);
 };
 
 template <typename T>
 void System::RequireComponent() {
 	const auto componentId = Component<T>::GetId();
 	componentSignature.set(componentId);
+}
+
+template <typename T, typename ...TArgs>
+void EntityManager::AddEntityToSystem(Entity entity, TArgs&& ...args) {
+	T* newSystem(new T(std::forward<TArgs>(args)...));
+	systems.insert(std::make_pair(std::type_index(typeid(T)), newSystem));
+}
+
+template <typename T>
+void EntityManager::RemoveSystem() {
+	auto system = systems.find(std::type_index(typeid(T)));
+	systems.erase(system);
+}
+
+template <typename T>
+bool EntityManager::HasSystem() const {
+	return systems.find(std::type_index(typeid(T))) != systems.end();
+}
+
+template <typename T>
+T& EntityManager::GetSystem() const {
+	auto system = systems.find(std::type_index(typeid(T)));
+	return *(std::static_pointer_cast<T>(system->second));
 }
 
 template <typename T, typename ...TArgs>
@@ -182,3 +202,4 @@ bool EntityManager::HasComponent(Entity entity) const {
 }
 
 #endif // ECS_H
+

@@ -7,6 +7,7 @@
 
 Game::Game() {
 	isRunning = false;
+	entityManager = new EntityManager();
 }
 
 Game::~Game() {
@@ -59,10 +60,8 @@ void Game::Run() {
 }
 
 void Game::Setup() {
-	// Entity tank = registry.CreateEntity();
-	// tank.AddComponent<TransformComponent>();
-	// tank.AddComponent<BoxColliderComponent>();
-	// tank.AddComponent<SpriteComponent>("./assets/images/tank.png");
+	Entity tank = entityManager->CreatEntity();
+	Entity truck = entityManager->CreatEntity();
 }
 
 void Game::ProcessInput() {

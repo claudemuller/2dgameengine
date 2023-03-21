@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include "../ECS/ECS.h"
 
 const int FPS = 60;
 const int MILLISECS_PER_FRAME = 1000/FPS;
@@ -13,6 +14,8 @@ private:
 
 	bool isRunning;
 	int millisecsPreviousFrame;
+
+	EntityManager *entityManager;
 
 public:
 	Game();
