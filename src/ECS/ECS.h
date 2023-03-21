@@ -41,6 +41,13 @@ public:
 	bool operator !=(const Entity& other) const { return id != other.id; }
 	bool operator <(const Entity& other) const { return id < other.id; }
 	bool operator >(const Entity& other) const { return id > other.id; }
+
+	template <typename T, typename ...TArgs> void AddComponent(TArgs&& ...args);
+	template <typename T> void RemoveComponent();
+	template <typename T> bool HasComponent() const;
+	template <typename T> T& GetComponent() const;
+
+	class EntityManager *entityManager;
 };
 
 class System {
@@ -207,6 +214,35 @@ bool EntityManager::HasComponent(Entity entity) const {
 	const auto componentId = Component<T>::GetId();
 	const auto entityId = entity.GetId();
 	return entityComponentSignatures[entityId].test(componentId);
+}
+
+template <typename T>
+T& EntityManager::GetComponent(Entity entity) const {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+	auto componentPool = std::static_pointer_cast<Pool<T>>(componentPools[componentId]);
+	return componentPool->Get(entityId);
+}
+
+
+template <typename T, typename ...TArgs>
+void Entity::AddComponent(TArgs&& ...args) {
+	entityManager->AddComponent<T>(*this, std::forward<TArgs>(args)...);
+}
+
+template <typename T>
+void Entity::RemoveComponent() {
+	entityManager->RemoveComponent<T>(*this);
+}
+
+template <typename T>
+bool Entity::HasComponent() const {
+	return entityManager->HasComponent<T>(*this);
+}
+
+template <typename T>
+T& Entity::GetComponent() const {
+	return entityManager->GetComponent<T>(*this);
 }
 
 #endif // ECS_H

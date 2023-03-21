@@ -29,6 +29,7 @@ const Signature& System::GetComponentSignature() const {
 Entity EntityManager::CreatEntity() {
 	int entityId = numEntities++;
 	Entity entity(entityId);
+	entity.entityManager = this;
 	entitiesToBeAdded.insert(entity);
 
 	if (entityId >= entityComponentSignatures.size()) {
