@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <set>
+#include <memory>
 
 const unsigned int MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
