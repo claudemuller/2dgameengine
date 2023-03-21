@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <bitset>
+#include <unordered_map>
+#include <typeindex>
+#include <set>
 
 const unsigned int MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
@@ -14,9 +17,6 @@ protected:
 
 template <typename T>
 class Component: public BaseComponent {
-private:
-
-public:
 	static int GetId() {
 		static auto id = nextId++;
 		return id;
@@ -29,7 +29,12 @@ private:
 
 public:
 	Entity(int id): id(id) {};
+	Entity(const Entity &entity) = default;
 	int GetId() const;
+
+	Entity& operator =(const Entity& other) = default;
+	bool operator ==(const Entity& other) const { return id == other.id; }
+	bool operator !=(const Entity& other) const { return id != other.id; }
 };
 
 class System {
@@ -49,14 +54,131 @@ public:
 	template <typename T> void RequireComponent();
 };
 
-class Registry {
+class PoolBase {
+public:
+	virtual ~PoolBase() {}
+};
 
+template <typename T>
+class Pool: public PoolBase {
+private:
+	std::vector<T> data;
+
+public:
+	Pool(int size = 100) {
+		data.resize(size);
+	}
+	virtual ~Pool() = default;
+
+	bool IsEmpty() const {
+		return data.empty();
+	}
+
+	int GetSize() const {
+		return data.size();
+	}
+
+	void Resize(int n) {
+		data.resize(n);
+	}
+
+	void Clear() {
+		data.clear();
+	}
+
+	void Add(T object) {
+		data.push_back(object);
+	}
+
+	void Set(int idx, T object) {
+		data[idx] = object;
+	}
+
+	T& Get(int idx) {
+		return static_cast<T>(data[idx]);
+	}
+
+	T& operator [](unsigned int idx) {
+		return data[idx];
+	}
+};
+
+class EntityManager {
+private:
+	int numEntities = 0;
+	std::vector<PoolBase*> componentPools;
+	std::vector<Signature> entityComponentSignatures;
+	std::unordered_map<std::type_index, System*> systems;
+	std::set<Entity> entitiesToBeAdded;
+	std::set<Entity> entitiesToBeKilled;
+
+public:
+	EntityManager() = default;
+
+	void Update();
+
+	Entity CreatEntity();
+
+	template <typename T, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
+	template <typename T> void RemoveComponent(Entity entity);
+	template <typename T> bool HasComponent(Entity entity) const;
+	template <typename T> T& GetComponent(Entity entity) const;
+
+	void AddEntityToSystem(Entity entity);
+
+	// Entity GetComponent(Entity entity) const;
+	// bool HasComponenent(Entity entity) const;
+
+	// AddSystem()
+	// RemoveSystem()
+	// HasSystem()
+	// GetSystem()
 };
 
 template <typename T>
 void System::RequireComponent() {
 	const auto componentId = Component<T>::GetId();
 	componentSignature.set(componentId);
+}
+
+template <typename T, typename ...TArgs>
+void EntityManager::AddComponent(Entity entity, TArgs&& ...args) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+
+	if (componentId >= componentPools.size()) {
+		componentPools.resize(componentId + 1, nullptr);
+	}
+
+	if (!componentPools[componentId]) {
+		Pool<T>* newComponentPool = new Pool<T>();
+		componentPools[componentId] = newComponentPool;
+	}
+
+	Pool<T>* componentPool = componentPools[componentId];
+
+	if (entityId >= componentPool->GetSize()) {
+		componentPool->Resize(numEntities);
+	}
+
+	T newComponent(std::forward<TArgs>(args)...);
+
+	componentPool->Set(entityId, newComponent);
+	entityComponentSignatures[entityId].set(componentId);
+}
+
+template <typename T>
+void EntityManager::RemoveComponent(Entity entity) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+	entityComponentSignatures[entityId].set(componentId, false);
+}
+
+template <typename T>
+bool EntityManager::HasComponent(Entity entity) const {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+	return entityComponentSignatures[entityId].test(componentId);
 }
 
 #endif // ECS_H
