@@ -5,8 +5,10 @@
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
 #include "../Systems/MovementSystem.h"
+#include "../Systems/RenderSystem.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/SpriteComponent.h"
 
 Game::Game() {
 	isRunning = false;
@@ -64,11 +66,13 @@ void Game::Run() {
 
 void Game::Setup() {
 	entityManager->AddSystem<MovementSystem>();
+	entityManager->AddSystem<RenderSystem>();
 
 	Entity tank = entityManager->CreatEntity();
 
 	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+	tank.AddComponent<SpriteComponent>(10, 10);
 }
 
 void Game::ProcessInput() {
@@ -92,7 +96,6 @@ void Game::Update() {
 	if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) SDL_Delay(timeToWait);
 
 	double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
-
 	millisecsPreviousFrame = SDL_GetTicks();
 
 	entityManager->GetSystem<MovementSystem>().Update(deltaTime);
@@ -104,7 +107,7 @@ void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
 	SDL_RenderClear(renderer);
 
-	// TODO: Render entitities
+	entityManager->GetSystem<RenderSystem>().Update(renderer);
 
 	SDL_RenderPresent(renderer);
 }
