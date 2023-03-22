@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
 #include "Game.h"
@@ -27,8 +28,8 @@ void Game::Init() {
 
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(1, &displayMode);
-	WindowWidth = 800; //displayMode.w;
-	WindowHeight = 600; //displayMode.h;
+	WindowWidth = 1920; //displayMode.w;
+	WindowHeight = 1024; //displayMode.h;
 
 	window = SDL_CreateWindow(
 			NULL,
@@ -65,23 +66,54 @@ void Game::Run() {
 	}
 }
 
-void Game::Setup() {
+void Game::LoadLevel(int level) {
 	entityManager->AddSystem<MovementSystem>();
 	entityManager->AddSystem<RenderSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
+
+	int tileSize = 32;
+	double tileScale = 2.0;
+	int mapNumCols = 25;
+	int mapNumRows = 20;
+	std::fstream mapFile;
+	mapFile.open("./assets/tilemaps/jungle.map");
+
+	for (int y = 0; y < mapNumRows; y++) {
+		for (int x = 0; x < mapNumCols; x++) {
+			char ch;
+			mapFile.get(ch);
+			int srcRectY = std::atoi(&ch) * tileSize;
+			mapFile.get(ch);
+			int srcRectX = std::atoi(&ch) * tileSize;
+			mapFile.ignore();
+
+			Entity tile = entityManager->CreatEntity();
+			tile.AddComponent<TransformComponent>(
+				glm::vec2(x * (tileScale*tileSize), y * (tileScale*tileSize)),
+				glm::vec2(tileScale, tileScale),
+				0.0
+			);
+			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, srcRectX, srcRectY);
+		}
+	}
+	mapFile.close();
 
 	Entity tank = entityManager->CreatEntity();
-	Entity truck = entityManager->CreatEntity();
-
 	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
 
+	Entity truck = entityManager->CreatEntity();
 	truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
 	truck.AddComponent<SpriteComponent>("truck-image", 32, 32);
+}
+
+void Game::Setup() {
+	LoadLevel(1);
 }
 
 void Game::ProcessInput() {
