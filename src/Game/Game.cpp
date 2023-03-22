@@ -91,11 +91,11 @@ void Game::Update() {
 	int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecsPreviousFrame);
 	if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) SDL_Delay(timeToWait);
 
-	float deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
+	double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
 
 	millisecsPreviousFrame = SDL_GetTicks();
 
-	entityManager->GetSystem<MovementSystem>().Update();
+	entityManager->GetSystem<MovementSystem>().Update(deltaTime);
 
 	entityManager->Update();
 }
