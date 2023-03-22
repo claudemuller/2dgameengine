@@ -108,7 +108,7 @@ public:
 	}
 
 	T& Get(int idx) {
-		return static_cast<T>(data[idx]);
+		return static_cast<T&>(data[idx]);
 	}
 
 	T& operator [](unsigned int idx) {
@@ -137,7 +137,7 @@ public:
 	template <typename T> bool HasComponent(Entity entity) const;
 	template <typename T> T& GetComponent(Entity entity) const;
 
-	template <typename T, typename ...TArgs> void AddEntityToSystem(Entity entity, TArgs&& ...args);
+	template <typename T, typename ...TArgs> void AddSystem(TArgs&& ...args);
 	template <typename T> void RemoveSystem();
 	template <typename T> bool HasSystem() const;
 	template <typename T> T& GetSystem() const;
@@ -152,7 +152,7 @@ void System::RequireComponent() {
 }
 
 template <typename T, typename ...TArgs>
-void EntityManager::AddEntityToSystem(Entity entity, TArgs&& ...args) {
+void EntityManager::AddSystem(TArgs&& ...args) {
 	std::shared_ptr<T> newSystem = std::make_shared<T>(std::forward<TArgs>(args)...);
 	systems.insert(std::make_pair(std::type_index(typeid(T)), newSystem));
 }
@@ -207,6 +207,8 @@ void EntityManager::RemoveComponent(Entity entity) {
 	const auto componentId = Component<T>::GetId();
 	const auto entityId = entity.GetId();
 	entityComponentSignatures[entityId].set(componentId, false);
+
+	Logger::Info("component id = " + std::to_string(componentId) + " was removed from entity id = " + std::to_string(entityId));
 }
 
 template <typename T>
@@ -223,7 +225,6 @@ T& EntityManager::GetComponent(Entity entity) const {
 	auto componentPool = std::static_pointer_cast<Pool<T>>(componentPools[componentId]);
 	return componentPool->Get(entityId);
 }
-
 
 template <typename T, typename ...TArgs>
 void Entity::AddComponent(TArgs&& ...args) {

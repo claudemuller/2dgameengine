@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
+#include "../Systems/MovementSystem.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 
@@ -62,10 +63,12 @@ void Game::Run() {
 }
 
 void Game::Setup() {
+	entityManager->AddSystem<MovementSystem>();
+
 	Entity tank = entityManager->CreatEntity();
 
-	entityManager->AddComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(0.0, 0.0), 0.0);
-	entityManager->AddComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
+	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
 }
 
 void Game::ProcessInput() {
@@ -92,8 +95,9 @@ void Game::Update() {
 
 	millisecsPreviousFrame = SDL_GetTicks();
 
-	// MovementSystem.Update();
-	// CollisionSystem.Update();
+	entityManager->GetSystem<MovementSystem>().Update();
+
+	entityManager->Update();
 }
 
 void Game::Render() {
