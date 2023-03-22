@@ -13,6 +13,7 @@
 Game::Game() {
 	isRunning = false;
 	entityManager = std::make_unique<EntityManager>();
+	assetStore = std::make_unique<AssetStore>();
 }
 
 Game::~Game() {
@@ -68,25 +69,33 @@ void Game::Setup() {
 	entityManager->AddSystem<MovementSystem>();
 	entityManager->AddSystem<RenderSystem>();
 
+	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
+	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+
 	Entity tank = entityManager->CreatEntity();
+	Entity truck = entityManager->CreatEntity();
 
 	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
-	tank.AddComponent<SpriteComponent>(10, 10);
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
+	tank.AddComponent<SpriteComponent>("tank-image", 10, 10);
+
+	truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
+	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
+	truck.AddComponent<SpriteComponent>("truck-image", 10, 50);
 }
 
 void Game::ProcessInput() {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
-			case SDL_QUIT:
+		case SDL_QUIT:
+			isRunning = false;
+			break;
+		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_ESCAPE) {
 				isRunning = false;
-				break;
-			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE) {
-					isRunning = false;
-				}
-				break;
+			}
+			break;
 		}
 	}
 }
