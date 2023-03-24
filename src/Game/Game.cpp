@@ -150,7 +150,7 @@ void Game::LoadLevel(int level) {
 
 	Entity tank = entityManager->CreatEntity();
 	tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(-50.0, 0.0));
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
 	tank.AddComponent<BoxColliderComponent>(32, 32);
 
@@ -210,7 +210,7 @@ void Game::Render() {
 	SDL_RenderClear(renderer);
 
 	entityManager->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
-	if (isDebug) entityManager->GetSystem<RenderColliderSystem>().Update(renderer);
+	if (isDebug) entityManager->GetSystem<RenderColliderSystem>().Update(renderer, camera);
 
 	SDL_RenderPresent(renderer);
 }
