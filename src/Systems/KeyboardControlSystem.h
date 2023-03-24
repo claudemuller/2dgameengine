@@ -26,6 +26,9 @@ public:
 			auto &sprite = entity.GetComponent<SpriteComponent>();
 			auto &rigidBody = entity.GetComponent<RigidBodyComponent>();
 
+			// if (event.symbol == SDLK_RIGHT) rigidBody.velocity += keyboardControl.rightVelocity;
+			// if (event.symbol == SDLK_DOWN) rigidBody.velocity += keyboardControl.downVelocity;
+
 			switch (event.symbol) {
 				case SDLK_UP:
 					rigidBody.velocity = keyboardControl.upVelocity;

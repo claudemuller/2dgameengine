@@ -39,8 +39,6 @@ public:
 					colliderB.width, colliderB.height
 				);
 				if (isColliding) {
-					entityA.Kill();
-					entityB.Kill();
 					eventBus->EmitEvent<CollisionEvent>(entityA, entityB);
 				}
 			}
