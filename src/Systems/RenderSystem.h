@@ -14,7 +14,7 @@ public:
 		RequireComponent<SpriteComponent>();
 	}
 
-	void Update(SDL_Renderer *renderer, std::unique_ptr<AssetStore>& assetStore) {
+	void Update(SDL_Renderer *renderer, std::unique_ptr<AssetStore>& assetStore, SDL_Rect &camera) {
 		// TODO: do the sorting somewhere else - rather layers?
 		struct RenderableEntity {
 			TransformComponent transformComponent;
@@ -38,8 +38,8 @@ public:
 
 			SDL_Rect srcRect = sprite.srcRect;
 			SDL_Rect dstRect = {
-				static_cast<int>(transform.position.x),
-				static_cast<int>(transform.position.y),
+				static_cast<int>(transform.position.x - camera.x),
+				static_cast<int>(transform.position.y - camera.y),
 				static_cast<int>(sprite.width * transform.scale.x),
 				static_cast<int>(sprite.height * transform.scale.y)
 			};

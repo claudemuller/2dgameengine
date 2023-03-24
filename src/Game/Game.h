@@ -13,6 +13,7 @@ class Game {
 private:
 	SDL_Window *window;
 	SDL_Renderer *renderer;
+	SDL_Rect camera;
 
 	bool isRunning;
 	bool isDebug;
@@ -35,8 +36,10 @@ public:
 	void Render();
 	void Cleanup();
 
-	int WindowWidth;
-	int WindowHeight;
+	static int WindowWidth;
+	static int WindowHeight;
+	static int MapWidth;
+	static int MapHeight;
 };
 
 #endif // GAME_H
