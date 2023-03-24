@@ -28,8 +28,8 @@ void Game::Init() {
 
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(1, &displayMode);
-	WindowWidth = 1920; //displayMode.w;
-	WindowHeight = 1024; //displayMode.h;
+	WindowWidth = displayMode.w;
+	WindowHeight = displayMode.h;
 
 	window = SDL_CreateWindow(
 			NULL,
@@ -96,7 +96,7 @@ void Game::LoadLevel(int level) {
 				glm::vec2(tileScale, tileScale),
 				0.0
 			);
-			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, srcRectX, srcRectY);
+			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
 		}
 	}
 	mapFile.close();
@@ -104,12 +104,12 @@ void Game::LoadLevel(int level) {
 	Entity tank = entityManager->CreatEntity();
 	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
-	tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
+	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
 
 	Entity truck = entityManager->CreatEntity();
-	truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
-	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
-	truck.AddComponent<SpriteComponent>("truck-image", 32, 32);
+	truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	truck.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 00.0));
+	truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 1);
 }
 
 void Game::Setup() {
