@@ -8,6 +8,7 @@
 #include <set>
 #include <memory>
 #include <algorithm>
+#include <deque>
 #include "../Logger/Logger.h"
 
 const unsigned int MAX_COMPONENTS = 32;
@@ -34,6 +35,8 @@ private:
 public:
 	Entity(int id): id(id) {};
 	Entity(const Entity &entity) = default;
+
+	void Kill();
 	int GetId() const;
 
 	Entity& operator =(const Entity& other) = default;
@@ -124,6 +127,7 @@ private:
 	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 	std::set<Entity> entitiesToBeAdded;
 	std::set<Entity> entitiesToBeKilled;
+	std::deque<int> freeIds;
 
 public:
 	EntityManager() = default;
@@ -131,6 +135,7 @@ public:
 	void Update();
 
 	Entity CreatEntity();
+	void KillEntity(Entity entity);
 
 	template <typename T, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
 	template <typename T> void RemoveComponent(Entity entity);
@@ -143,6 +148,7 @@ public:
 	template <typename T> T& GetSystem() const;
 
 	void AddEntityToSystems(Entity entity);
+	void RemoveEntityFromSystems(Entity entity);
 };
 
 template <typename T>

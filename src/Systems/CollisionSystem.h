@@ -40,7 +40,8 @@ public:
 					colliderB.width, colliderB.height
 				);
 				if (isColliding) {
-					Logger::Info("Collision detected!!!!");
+					entityA.Kill();
+					entityB.Kill();
 					colliderA.colour.g = 0;
 					colliderB.colour.g = 0;
 				}
