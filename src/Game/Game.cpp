@@ -7,9 +7,11 @@
 #include "../ECS/ECS.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
+#include "../Systems/AnimationSystem.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../Components/AnimationComponent.h"
 
 Game::Game() {
 	isRunning = false;
@@ -69,9 +71,12 @@ void Game::Run() {
 void Game::LoadLevel(int level) {
 	entityManager->AddSystem<MovementSystem>();
 	entityManager->AddSystem<RenderSystem>();
+	entityManager->AddSystem<AnimationSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+	assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper.png");
+	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
 	int tileSize = 32;
@@ -101,15 +106,27 @@ void Game::LoadLevel(int level) {
 	}
 	mapFile.close();
 
-	Entity tank = entityManager->CreatEntity();
-	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
-	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
+	Entity radar = entityManager->CreatEntity();
+	radar.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2);
+	radar.AddComponent<AnimationComponent>(8, 5, true);
 
-	Entity truck = entityManager->CreatEntity();
-	truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-	truck.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 00.0));
-	truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 1);
+	Entity chopper = entityManager->CreatEntity();
+	chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	chopper.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+	chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
+	chopper.AddComponent<AnimationComponent>(2, 15, true);
+
+	// Entity tank = entityManager->CreatEntity();
+	// tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	// tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
+	// tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
+	//
+	// Entity truck = entityManager->CreatEntity();
+	// truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	// truck.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 00.0));
+	// truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 1);
 }
 
 void Game::Setup() {
@@ -139,9 +156,10 @@ void Game::Update() {
 	double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
 	millisecsPreviousFrame = SDL_GetTicks();
 
-	entityManager->GetSystem<MovementSystem>().Update(deltaTime);
-
 	entityManager->Update();
+
+	entityManager->GetSystem<MovementSystem>().Update(deltaTime);
+	entityManager->GetSystem<AnimationSystem>().Update();
 }
 
 void Game::Render() {
