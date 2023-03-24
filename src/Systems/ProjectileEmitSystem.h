@@ -14,6 +14,21 @@
 #include "../Components/CameraFollowComponent.h"
 
 class ProjectileEmitSystem : public System {
+private:
+	void emitProjectile(
+		Entity entity,
+		glm::vec2 projectilePos,
+		glm::vec2 projectileVel,
+		ProjectileEmitterComponent projectileEmitter
+	) {
+		Entity projectile = entity.entityManager->CreatEntity();
+		projectile.AddComponent<TransformComponent>(projectilePos, glm::vec2(1.0, 1.0), 0.0);
+		projectile.AddComponent<RigidBodyComponent>(projectileVel);
+		projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4);
+		projectile.AddComponent<BoxColliderComponent>(4, 4);
+		projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+	}
+
 public:
 	ProjectileEmitSystem() {
 		RequireComponent<ProjectileEmitterComponent>();
@@ -32,11 +47,11 @@ public:
 					const auto transform = entity.GetComponent<TransformComponent>();
 					const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
 
-					glm::vec2 projectilePostion = transform.position;
+					glm::vec2 projectilePosition = transform.position;
 					if (entity.HasComponent<SpriteComponent>()) {
 						auto sprite = entity.GetComponent<SpriteComponent>();
-						projectilePostion.x += (transform.scale.x * sprite.width / 2);
-						projectilePostion.y += (transform.scale.y * sprite.height / 2);
+						projectilePosition.x += (transform.scale.x * sprite.width / 2);
+						projectilePosition.y += (transform.scale.y * sprite.height / 2);
 					}
 
 					glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
@@ -49,12 +64,7 @@ public:
 					projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
 					projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
 
-					Entity projectile = entity.entityManager->CreatEntity();
-					projectile.AddComponent<TransformComponent>(projectilePostion, glm::vec2(1.0, 1.0), 0.0);
-					projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
-					projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4);
-					projectile.AddComponent<BoxColliderComponent>(4, 4);
-					projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+					emitProjectile(entity, projectilePosition, projectileVelocity, projectileEmitter);
 				}
 			}
 		}
@@ -77,12 +87,7 @@ public:
 					projectilePosition.y += transform.scale.y * sprite.height / 2;
 				}
 
-				Entity projectile = entityManager->CreatEntity();
-				projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0.0);
-				projectile.AddComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
-				projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4);
-				projectile.AddComponent<BoxColliderComponent>(4, 4);
-				projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+				emitProjectile(entity, projectilePosition, projectileEmitter.projectileVelocity, projectileEmitter);
 
 				projectileEmitter.lastEmissionTime = SDL_GetTicks();
 			}
