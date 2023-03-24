@@ -172,6 +172,7 @@ void Game::Update() {
 
 	eventBus->Reset();
 	entityManager->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+	entityManager->GetSystem<RenderColliderSystem>().SubscribeToEvents(eventBus);
 
 	entityManager->Update();
 

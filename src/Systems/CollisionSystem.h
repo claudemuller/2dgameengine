@@ -32,9 +32,6 @@ public:
 				TransformComponent transformB = entityB.GetComponent<TransformComponent>();
 				BoxColliderComponent &colliderB = entityB.GetComponent<BoxColliderComponent>();
 
-				colliderA.colour.g = 255;
-				colliderB.colour.g = 255;
-
 				bool isColliding = checkAABBCollision(
 					transformA.position.x, transformA.position.y,
 					colliderA.width, colliderA.height,
@@ -44,8 +41,6 @@ public:
 				if (isColliding) {
 					entityA.Kill();
 					entityB.Kill();
-					colliderA.colour.g = 0;
-					colliderB.colour.g = 0;
 					eventBus->EmitEvent<CollisionEvent>(entityA, entityB);
 				}
 			}

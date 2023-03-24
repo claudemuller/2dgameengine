@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 #include "../ECS/ECS.h"
+#include "../EventBus/EventBus.h"
+#include "../Events/CollisionEvent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/BoxColliderComponent.h"
 
@@ -11,6 +13,15 @@ public:
 	RenderColliderSystem() {
 		RequireComponent<TransformComponent>();
 		RequireComponent<BoxColliderComponent>();
+	}
+
+	void SubscribeToEvents(std::unique_ptr<EventBus> &eventBus) {
+		eventBus->SubscribeToEvent<CollisionEvent>(this, &RenderColliderSystem::onCollision);
+	}
+
+	void onCollision(CollisionEvent &event) {
+		event.a.GetComponent<BoxColliderComponent>().colour = {255, 0, 0, 255};
+		event.b.GetComponent<BoxColliderComponent>().colour = {255, 0, 0, 255};
 	}
 
 	void Update(SDL_Renderer *renderer) {
