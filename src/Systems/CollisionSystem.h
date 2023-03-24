@@ -3,6 +3,8 @@
 
 #include "../ECS/ECS.h"
 #include "../Logger/Logger.h"
+#include "../EventBus/EventBus.h"
+#include "../Events/CollisionEvent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/TransformComponent.h"
 
@@ -13,7 +15,7 @@ public:
 		RequireComponent<TransformComponent>();
 	}
 
-	void Update() {
+	void Update(std::unique_ptr<EventBus>& eventBus) {
 		std::vector<Entity> entities = GetSystemEntities();
 		for (auto i = entities.begin(); i != entities.end(); i++) {
 			Entity entityA = *i;
@@ -33,7 +35,7 @@ public:
 				colliderA.colour.g = 255;
 				colliderB.colour.g = 255;
 
-				bool isColliding = CheckAABBCollision(
+				bool isColliding = checkAABBCollision(
 					transformA.position.x, transformA.position.y,
 					colliderA.width, colliderA.height,
 					transformB.position.x, transformB.position.y,
@@ -44,12 +46,14 @@ public:
 					entityB.Kill();
 					colliderA.colour.g = 0;
 					colliderB.colour.g = 0;
+					eventBus->EmitEvent<CollisionEvent>(entityA, entityB);
 				}
 			}
 		}
 	}
 
-	bool CheckAABBCollision(double aX, double aY, double aW, double aH, double bX, double bY, double bW, double bH) {
+private:
+	bool checkAABBCollision(double aX, double aY, double aW, double aH, double bX, double bY, double bW, double bH) {
 		return aX < bX + bW
 			&& aX + aW > bX
 			&& aY < bY + bH

@@ -10,6 +10,7 @@
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderColliderSystem.h"
+#include "../Systems/DamageSystem.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
@@ -21,6 +22,7 @@ Game::Game() {
 	isDebug = false;
 	entityManager = std::make_unique<EntityManager>();
 	assetStore = std::make_unique<AssetStore>();
+	eventBus = std::make_unique<EventBus>();
 }
 
 Game::~Game() {
@@ -78,6 +80,7 @@ void Game::LoadLevel(int level) {
 	entityManager->AddSystem<AnimationSystem>();
 	entityManager->AddSystem<CollisionSystem>();
 	entityManager->AddSystem<RenderColliderSystem>();
+	entityManager->AddSystem<DamageSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -167,11 +170,14 @@ void Game::Update() {
 	double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
 	millisecsPreviousFrame = SDL_GetTicks();
 
+	eventBus->Reset();
+	entityManager->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+
 	entityManager->Update();
 
 	entityManager->GetSystem<MovementSystem>().Update(deltaTime);
 	entityManager->GetSystem<AnimationSystem>().Update();
-	entityManager->GetSystem<CollisionSystem>().Update();
+	entityManager->GetSystem<CollisionSystem>().Update(eventBus);
 }
 
 void Game::Render() {
