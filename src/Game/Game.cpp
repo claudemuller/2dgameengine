@@ -11,6 +11,8 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderColliderSystem.h"
 #include "../Systems/DamageSystem.h"
+#include "../Systems/KeyboardMovementSystem.h"
+#include "../Events/KeyPressedEvent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
@@ -81,6 +83,7 @@ void Game::LoadLevel(int level) {
 	entityManager->AddSystem<CollisionSystem>();
 	entityManager->AddSystem<RenderColliderSystem>();
 	entityManager->AddSystem<DamageSystem>();
+	entityManager->AddSystem<KeyboardMovementSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -158,6 +161,7 @@ void Game::ProcessInput() {
 			if (event.key.keysym.sym == SDLK_d) {
 				isDebug = !isDebug;
 			}
+			eventBus->EmitEvent<KeyPressedEvent>(event.key.keysym.sym);
 			break;
 		}
 	}
@@ -173,6 +177,7 @@ void Game::Update() {
 	eventBus->Reset();
 	entityManager->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
 	entityManager->GetSystem<RenderColliderSystem>().SubscribeToEvents(eventBus);
+	entityManager->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
 
 	entityManager->Update();
 
