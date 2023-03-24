@@ -14,6 +14,7 @@
 #include "../Systems/KeyboardControlSystem.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
+#include "../Systems/ProjectileLifecycleSystem.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
@@ -102,6 +103,7 @@ void Game::LoadLevel(int level) {
 	entityManager->AddSystem<KeyboardControlSystem>();
 	entityManager->AddSystem<CameraMovementSystem>();
 	entityManager->AddSystem<ProjectileEmitSystem>();
+	entityManager->AddSystem<ProjectileLifecycleSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -159,7 +161,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
 	tank.AddComponent<BoxColliderComponent>(32, 32);
-	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, 0, false);
+	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 0, false);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = entityManager->CreatEntity();
@@ -167,7 +169,7 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 1);
 	truck.AddComponent<BoxColliderComponent>(32, 32);
-	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, 0, false);
+	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 5000, 0, false);
 	truck.AddComponent<HealthComponent>(100);
 }
 
@@ -214,6 +216,7 @@ void Game::Update() {
 	entityManager->GetSystem<CollisionSystem>().Update(eventBus);
 	entityManager->GetSystem<ProjectileEmitSystem>().Update(entityManager);
 	entityManager->GetSystem<CameraMovementSystem>().Update(camera);
+	entityManager->GetSystem<ProjectileLifecycleSystem>().Update();
 }
 
 void Game::Render() {
