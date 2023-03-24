@@ -9,6 +9,7 @@ struct SpriteComponent {
 	int width;
 	int height;
 	int zIndex;
+	bool isFixed;
 	SDL_Rect srcRect;
 
 	SpriteComponent(
@@ -16,6 +17,7 @@ struct SpriteComponent {
 		int width = 0,
 		int height = 0,
 		int zIndex = 0,
+		bool isFixed = false,
 		int srcRectX = 0,
 		int srcRectY = 0
 	) {
@@ -23,6 +25,7 @@ struct SpriteComponent {
 		this->width = width;
 		this->height = height;
 		this->zIndex = zIndex;
+		this->isFixed = isFixed;
 		this->srcRect = {srcRectX, srcRectY, width, height};
 	}
 };

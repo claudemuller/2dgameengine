@@ -127,7 +127,7 @@ void Game::LoadLevel(int level) {
 				glm::vec2(tileScale, tileScale),
 				0.0
 			);
-			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
+			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
 		}
 	}
 	mapFile.close();
@@ -135,9 +135,9 @@ void Game::LoadLevel(int level) {
 	MapHeight = tileSize * mapNumRows * tileScale;
 
 	Entity radar = entityManager->CreatEntity();
-	radar.AddComponent<TransformComponent>(glm::vec2(WindowWidth - 64, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	radar.AddComponent<TransformComponent>(glm::vec2(WindowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2);
+	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
 	radar.AddComponent<AnimationComponent>(8, 5, true);
 
 	Entity chopper = entityManager->CreatEntity();
