@@ -14,6 +14,7 @@ private:
 	SDL_Renderer *renderer;
 
 	bool isRunning;
+	bool isDebug;
 	int millisecsPreviousFrame;
 
 	std::unique_ptr<EntityManager> entityManager;

@@ -9,6 +9,7 @@
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
+#include "../Systems/RenderColliderSystem.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
@@ -17,6 +18,7 @@
 
 Game::Game() {
 	isRunning = false;
+	isDebug = false;
 	entityManager = std::make_unique<EntityManager>();
 	assetStore = std::make_unique<AssetStore>();
 }
@@ -75,6 +77,7 @@ void Game::LoadLevel(int level) {
 	entityManager->AddSystem<RenderSystem>();
 	entityManager->AddSystem<AnimationSystem>();
 	entityManager->AddSystem<CollisionSystem>();
+	entityManager->AddSystem<RenderColliderSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -149,6 +152,9 @@ void Game::ProcessInput() {
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
 				isRunning = false;
 			}
+			if (event.key.keysym.sym == SDLK_d) {
+				isDebug = !isDebug;
+			}
 			break;
 		}
 	}
@@ -173,6 +179,7 @@ void Game::Render() {
 	SDL_RenderClear(renderer);
 
 	entityManager->GetSystem<RenderSystem>().Update(renderer, assetStore);
+	if (isDebug) entityManager->GetSystem<RenderColliderSystem>().Update(renderer);
 
 	SDL_RenderPresent(renderer);
 }

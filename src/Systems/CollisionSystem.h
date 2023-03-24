@@ -18,7 +18,7 @@ public:
 		for (auto i = entities.begin(); i != entities.end(); i++) {
 			Entity entityA = *i;
 			TransformComponent transformA = entityA.GetComponent<TransformComponent>();
-			BoxColliderComponent colliderA = entityA.GetComponent<BoxColliderComponent>();
+			BoxColliderComponent &colliderA = entityA.GetComponent<BoxColliderComponent>();
 
 			for (auto j = i; j != entities.end(); j++) {
 				Entity entityB = *j;
@@ -28,15 +28,21 @@ public:
 				}
 
 				TransformComponent transformB = entityB.GetComponent<TransformComponent>();
-				BoxColliderComponent colliderB = entityB.GetComponent<BoxColliderComponent>();
+				BoxColliderComponent &colliderB = entityB.GetComponent<BoxColliderComponent>();
 
-				if (CheckAABBCollision(
+				colliderA.colour.g = 255;
+				colliderB.colour.g = 255;
+
+				bool isColliding = CheckAABBCollision(
 					transformA.position.x, transformA.position.y,
 					colliderA.width, colliderA.height,
 					transformB.position.x, transformB.position.y,
 					colliderB.width, colliderB.height
-				)) {
+				);
+				if (isColliding) {
 					Logger::Info("Collision detected!!!!");
+					colliderA.colour.g = 0;
+					colliderB.colour.g = 0;
 				}
 			}
 		}
