@@ -51,11 +51,18 @@ void RenderGUISystem::renderInfoOverlay(const std::unique_ptr<EntityManager> &en
 	ImGui::SetNextWindowBgAlpha(0.35f);
     if (ImGui::Begin("World Info", nullptr, windowFlags)) {
 		ImGui::Text("World Info");
-
         ImGui::Separator();
+
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::Text("Map Co-ords:  (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
+        ImGui::Separator();
+
 		ImGui::Text("NumEntites: %zu", entityManager->NumEntites());
-
         ImGui::Separator();
+
+		ImGui::Text("Entities by Group");
+        ImGui::Separator();
+
 		for (size_t i = 0; i < 5; i++) {
 			auto n = entityManager->GetEntitiesByGroup(Game::Groups[i]);
 			if (!n.empty())
@@ -68,56 +75,67 @@ void RenderGUISystem::renderInfoOverlay(const std::unique_ptr<EntityManager> &en
 
 void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &entityManager) {
 	if (ImGui::Begin("Spawn Enemies", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)) {
-		ImGui::Text("Here is where enemies are spawned");
+		ImGui::Text("Spawn enemies here by entering some values.");
 
-		ImGui::SeparatorText("Enemy Properties");
+		const char* groupItems[] = {"ui", "player", "enemies", "tiles", "projectiles"};
+		static int curGroupIdx = 0;
 
-		const char* groupItems[] = {"enemies", "tiles"};
-        static int curGroupIdx = 0;
-        ImGui::Combo("group", &curGroupIdx, groupItems, IM_ARRAYSIZE(groupItems));
+		ImGui::SeparatorText("Properties");
+		if (ImGui::CollapsingHeader("Group")) {
+			ImGui::Combo("group", &curGroupIdx, groupItems, IM_ARRAYSIZE(groupItems));
+		}
 
 		const char* spriteItems[] = {"tank-image", "truck-image", "chopper-image"};
 		static int curSpriteIdx = 0;
-        ImGui::Combo("sprite", &curSpriteIdx, spriteItems, IM_ARRAYSIZE(spriteItems));
+
+		if (ImGui::CollapsingHeader("Sprite")) {
+			ImGui::Combo("sprite", &curSpriteIdx, spriteItems, IM_ARRAYSIZE(spriteItems));
+		}
 
 		static int health = 100;
-		ImGui::InputInt("health", &health);
+		if (ImGui::CollapsingHeader("Health")) {
+			ImGui::InputInt("health", &health);
+		}
 
 		char *sliderToolTip = "CTRL+click to input value.";
 
 		static int x = 0, y = 0;
-		ImGui::SliderInt("x", &x, 0, 1920);
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
-		ImGui::SliderInt("y", &y, 0, 720);
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
+		static float scaleX = 1.0, scaleY = 1.0;
+		static float rot = 0.0;
+		if (ImGui::CollapsingHeader("Transform")) {
+			ImGui::SliderInt("position x", &x, 0, 1920);
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+			ImGui::SliderInt("position y", &y, 0, 720);
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+
+			ImGui::SliderFloat("scale x", &scaleX, 1, 100);
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+			ImGui::SliderFloat("scale y", &scaleY, 1, 100);
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+
+			ImGui::SliderFloat("rotation", &rot, -180, 180);
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+		}
 
 		static float velX = 0.0, velY = 0.0;
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
-		ImGui::SliderFloat("xVelocity", &velX, 0, 1000);
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
-		ImGui::SliderFloat("yVelocity", &velY, 0, 1000);
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
-
-		static float scaleX = 1.0, scaleY = 1.0;
-		ImGui::SliderFloat("xScale", &scaleX, 1, 100);
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
-		ImGui::SliderFloat("yScale", &scaleY, 1, 100);
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
-
-		static float rot = 0.0;
-		ImGui::SliderFloat("rotation", &rot, -180, 180);
-		ImGui::SameLine(); HelpMarker(sliderToolTip);
-
-		ImGui::SeparatorText("Projectile Properties");
+		if (ImGui::CollapsingHeader("Rigid body")) {
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+			ImGui::SliderFloat("velocity x", &velX, 0, 1000);
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+			ImGui::SliderFloat("velocity y", &velY, 0, 1000);
+			ImGui::SameLine(); HelpMarker(sliderToolTip);
+		}
 
 		static float projectileVelX = 100.0, projectileVelY = 0;
-		ImGui::SliderFloat("xProjectileVelocity", &projectileVelX, 0, 1000);
-		ImGui::SliderFloat("yProjectileVelocity", &projectileVelY, 0, 1000);
-
 		static int projectileFreq = 1000, projectileDuration = 2000, projectileHitDamage = 10;
-		ImGui::InputInt("xProjectileFrequency", &projectileFreq);
-		ImGui::InputInt("yProjectileDuration", &projectileDuration);
-		ImGui::InputInt("yProjectileHitDamage", &projectileHitDamage);
+		if (ImGui::CollapsingHeader("Projectile Emitter")) {
+			ImGui::SliderFloat("velocity x", &projectileVelX, 0, 1000);
+			ImGui::SliderFloat("velocity y", &projectileVelY, 0, 1000);
+
+			ImGui::InputInt("frequency", &projectileFreq);
+			ImGui::InputInt("duration", &projectileDuration);
+			ImGui::InputInt("hit damage", &projectileHitDamage);
+		}
 
 		if (ImGui::Button("Spawn Enemy")) {
 			Entity entity = entityManager->CreatEntity();
