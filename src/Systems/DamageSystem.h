@@ -14,14 +14,7 @@ private:
 		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
 
 		if (!projectileComponent.isFriendly) {
-			auto &health = player.GetComponent<HealthComponent>();
-			health.healthPercentage -= projectileComponent.hitPercentDamage;
-
-			if (health.healthPercentage <= 0) {
-				player.Kill();
-			}
-
-			projectile.Kill();
+			handleEntityProjectileHit(projectile, projectileComponent, player);
 		}
 	}
 
@@ -29,15 +22,19 @@ private:
 		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
 
 		if (projectileComponent.isFriendly) {
-			auto &health = enemy.GetComponent<HealthComponent>();
+			handleEntityProjectileHit(projectile, projectileComponent, enemy);
+		}
+	}
+
+	void handleEntityProjectileHit(Entity projectile, ProjectileComponent projectileComponent, Entity entity) {
+			auto &health = entity.GetComponent<HealthComponent>();
 			health.healthPercentage -= projectileComponent.hitPercentDamage;
 
 			if (health.healthPercentage <= 0) {
-				enemy.Kill();
+				entity.Kill();
 			}
 
 			projectile.Kill();
-		}
 	}
 
 public:
