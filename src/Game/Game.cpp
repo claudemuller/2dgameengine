@@ -15,6 +15,7 @@
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
 #include "../Systems/ProjectileLifecycleSystem.h"
+#include "../Systems/RenderTextSystem.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
@@ -25,6 +26,7 @@
 #include "../Components/CameraFollowComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/HealthComponent.h"
+#include "../Components/TextLabelComponent.h"
 
 int Game::WindowWidth;
 int Game::WindowHeight;
@@ -47,6 +49,11 @@ void Game::Init() {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		Logger::Err("error initing SDL");
+		return;
+	}
+
+	if (TTF_Init() != 0) {
+		Logger::Err("error initing TTF");
 		return;
 	}
 
@@ -106,6 +113,7 @@ void Game::LoadLevel(int level) {
 	entityManager->AddSystem<CameraMovementSystem>();
 	entityManager->AddSystem<ProjectileEmitSystem>();
 	entityManager->AddSystem<ProjectileLifecycleSystem>();
+	entityManager->AddSystem<RenderTextSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -113,6 +121,7 @@ void Game::LoadLevel(int level) {
 	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 	assetStore->AddTexture(renderer, "bullet-image", "./assets/images/bullet.png");
+	assetStore->AddFont("charriot-font", "./assets/fonts/charriot.ttf", 20);
 
 	int tileSize = 32;
 	double tileScale = 2.0;
@@ -179,6 +188,10 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<BoxColliderComponent>(32, 32);
 	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 5000, 10, false);
 	truck.AddComponent<HealthComponent>(100);
+
+	Entity label = entityManager->CreatEntity();
+	SDL_Color green = {0, 255, 0};
+	label.AddComponent<TextLabelComponent>(glm::vec2(WindowWidth / 2 - 40, 10), "Chopper v1.0", "charriot-font", green);
 }
 
 void Game::Setup() {
@@ -233,6 +246,7 @@ void Game::Render() {
 	SDL_RenderClear(renderer);
 
 	entityManager->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
+	entityManager->GetSystem<RenderTextSystem>().Update(assetStore, renderer, camera);
 	if (isDebug) entityManager->GetSystem<RenderColliderSystem>().Update(renderer, camera);
 
 	SDL_RenderPresent(renderer);
@@ -241,5 +255,6 @@ void Game::Render() {
 void Game::Cleanup() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	// TTF_Quit();
 	SDL_Quit();
 }
