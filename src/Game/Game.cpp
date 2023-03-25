@@ -16,6 +16,7 @@
 #include "../Systems/ProjectileEmitSystem.h"
 #include "../Systems/ProjectileLifecycleSystem.h"
 #include "../Systems/RenderTextSystem.h"
+#include "../Systems/RenderHealthBarSystem.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
@@ -114,6 +115,7 @@ void Game::LoadLevel(int level) {
 	entityManager->AddSystem<ProjectileEmitSystem>();
 	entityManager->AddSystem<ProjectileLifecycleSystem>();
 	entityManager->AddSystem<RenderTextSystem>();
+	entityManager->AddSystem<RenderHealthBarSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -121,7 +123,9 @@ void Game::LoadLevel(int level) {
 	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 	assetStore->AddTexture(renderer, "bullet-image", "./assets/images/bullet.png");
-	assetStore->AddFont("charriot-font", "./assets/fonts/charriot.ttf", 20);
+	assetStore->AddFont("charriot-font-20", "./assets/fonts/charriot.ttf", 20);
+	assetStore->AddFont("pico8-font-5", "./assets/fonts/pico8.ttf", 5);
+	assetStore->AddFont("pico8-font-10", "./assets/fonts/pico8.ttf", 10);
 
 	int tileSize = 32;
 	double tileScale = 2.0;
@@ -191,7 +195,7 @@ void Game::LoadLevel(int level) {
 
 	Entity label = entityManager->CreatEntity();
 	SDL_Color green = {0, 255, 0};
-	label.AddComponent<TextLabelComponent>(glm::vec2(WindowWidth / 2 - 40, 10), "Chopper v1.0", "charriot-font", green);
+	label.AddComponent<TextLabelComponent>(glm::vec2(WindowWidth / 2 - 40, 10), "Chopper v1.0", "charriot-font-20", green);
 }
 
 void Game::Setup() {
@@ -245,8 +249,9 @@ void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
 	SDL_RenderClear(renderer);
 
-	entityManager->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
-	entityManager->GetSystem<RenderTextSystem>().Update(assetStore, renderer, camera);
+	entityManager->GetSystem<RenderSystem>().Update(renderer, camera, assetStore);
+	entityManager->GetSystem<RenderTextSystem>().Update(renderer, camera, assetStore);
+	entityManager->GetSystem<RenderHealthBarSystem>().Update(renderer, camera, assetStore);
 	if (isDebug) entityManager->GetSystem<RenderColliderSystem>().Update(renderer, camera);
 
 	SDL_RenderPresent(renderer);

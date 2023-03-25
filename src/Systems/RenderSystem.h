@@ -14,7 +14,7 @@ public:
 		RequireComponent<SpriteComponent>();
 	}
 
-	void Update(SDL_Renderer *renderer, std::unique_ptr<AssetStore>& assetStore, SDL_Rect &camera) {
+	void Update(SDL_Renderer *renderer, SDL_Rect &camera, std::unique_ptr<AssetStore>& assetStore) {
 		// TODO: do the sorting somewhere else - rather layers?
 		struct RenderableEntity {
 			TransformComponent transformComponent;

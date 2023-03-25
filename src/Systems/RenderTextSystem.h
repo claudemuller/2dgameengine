@@ -12,7 +12,7 @@ public:
 		RequireComponent<TextLabelComponent>();
 	}
 
-	void Update(std::unique_ptr<AssetStore> &assetStore, SDL_Renderer *renderer, SDL_Rect camera) {
+	void Update(SDL_Renderer *renderer, SDL_Rect camera, std::unique_ptr<AssetStore> &assetStore) {
 		for (auto entity: GetSystemEntities()) {
 			const auto textLabel = entity.GetComponent<TextLabelComponent>();
 			SDL_Surface *surface = TTF_RenderText_Blended(
@@ -34,6 +34,8 @@ public:
 				labelHeight
 			};
 			SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+
+			SDL_DestroyTexture(texture);
 		}
 	}
 };
