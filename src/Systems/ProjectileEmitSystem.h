@@ -22,6 +22,7 @@ private:
 		ProjectileEmitterComponent projectileEmitter
 	) {
 		Entity projectile = entity.entityManager->CreatEntity();
+		projectile.Group("projectiles");
 		projectile.AddComponent<TransformComponent>(projectilePos, glm::vec2(1.0, 1.0), 0.0);
 		projectile.AddComponent<RigidBodyComponent>(projectileVel);
 		projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4);
@@ -56,7 +57,10 @@ public:
 
 					glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
 					int directionX = 0;
-					int directionY = -1;
+					int directionY = 0;
+
+					if (rigidBody.velocity.x == 0 && rigidBody.velocity.y == 0) directionY = -1;
+
 					if (rigidBody.velocity.x > 0) directionX = +1;
 					if (rigidBody.velocity.x < 0) directionX = -1;
 					if (rigidBody.velocity.y > 0) directionY = +1;

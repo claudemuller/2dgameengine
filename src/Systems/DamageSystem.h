@@ -5,8 +5,41 @@
 #include "../EventBus/EventBus.h"
 #include "../Events/CollisionEvent.h"
 #include "../Components/BoxColliderComponent.h"
+#include "../Components/ProjectileComponent.h"
+#include "../Components/HealthComponent.h"
 
 class DamageSystem: public System {
+private:
+	void onProjectileHitsPlayer(Entity projectile, Entity player) {
+		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
+
+		if (!projectileComponent.isFriendly) {
+			auto &health = player.GetComponent<HealthComponent>();
+			health.healthPercentage -= projectileComponent.hitPercentDamage;
+
+			if (health.healthPercentage <= 0) {
+				player.Kill();
+			}
+
+			projectile.Kill();
+		}
+	}
+
+	void onProjectileHitsEnemy(Entity projectile, Entity enemy) {
+		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
+
+		if (projectileComponent.isFriendly) {
+			auto &health = enemy.GetComponent<HealthComponent>();
+			health.healthPercentage -= projectileComponent.hitPercentDamage;
+
+			if (health.healthPercentage <= 0) {
+				enemy.Kill();
+			}
+
+			projectile.Kill();
+		}
+	}
+
 public:
 	DamageSystem() {
 		RequireComponent<BoxColliderComponent>();
@@ -17,10 +50,24 @@ public:
 	}
 
 	void OnCollision(CollisionEvent& event) {
+		Entity a = event.a;
+		Entity b = event.b;
+
 		Logger::Info("The damage system received event: "
-			   + std::to_string(event.a.GetId()) + " and " + std::to_string(event.b.GetId()));
-		// event.a.Kill();
-		// event.b.Kill();
+			   + std::to_string(a.GetId()) + " and " + std::to_string(b.GetId()));
+
+		if (a.InGroup("projectiles") && b.HasTag("player")) {
+			onProjectileHitsPlayer(a, b);
+		}
+		if (b.InGroup("projectiles") && a.HasTag("player")) {
+			onProjectileHitsPlayer(b, a);
+		}
+		if (a.InGroup("projectiles") && b.InGroup("enemies")) {
+			onProjectileHitsEnemy(a, b);
+		}
+		if (b.InGroup("projectiles") && a.InGroup("enemies")) {
+			onProjectileHitsEnemy(b, a);
+		}
 	}
 };
 
