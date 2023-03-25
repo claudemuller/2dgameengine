@@ -3,7 +3,7 @@ CFLAGS=-Wall -Wfatal-errors -std=c++17
 INCS=-I/opt/homebrew/include -I./libs/ -I./libs/lua/
 LIBS=-L/opt/homebrew/lib
 LFLAGS=-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua
-SRC=./src/*.cpp ./src/**/*.cpp
+SRC=./src/*.cpp ./src/Game/*.cpp ./src/AssetStore/*.cpp ./src/ECS/*.cpp ./src/Logger/*.cpp
 BIN=gameengine
 
 all: clean build run
