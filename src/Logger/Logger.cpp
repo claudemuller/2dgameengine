@@ -2,6 +2,8 @@
 #include <iomanip>
 #include "Logger.h"
 
+bool Logger::Log = false;
+
 const char* RESET = "\033[0m";
 const char* RED = "\033[31m";
 const char* YELLOW = "\033[33m";
@@ -26,13 +28,13 @@ void printMessage(enum LogType type, std::string message, const char* colour) {
 }
 
 void Logger::Info(const std::string &message) {
-    printMessage(LogType::LOG_INFO, message, RESET);
+    if (Log) printMessage(LogType::LOG_INFO, message, RESET);
 }
 
 void Logger::Warn(const std::string &message) {
-    printMessage(LogType::LOG_WARN, message, YELLOW);
+    if (Log) printMessage(LogType::LOG_WARN, message, YELLOW);
 }
 
 void Logger::Err(const std::string &message) {
-    printMessage(LogType::LOG_ERR, message, RED);
+    if (Log) printMessage(LogType::LOG_ERR, message, RED);
 }

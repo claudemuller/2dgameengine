@@ -19,6 +19,7 @@ class Logger {
 private:
 
 public:
+    static bool Log;
     static std::vector<LogEntry> messages;
     static void Info(const std::string &message);
     static void Warn(const std::string &message);
