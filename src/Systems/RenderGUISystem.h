@@ -81,19 +81,19 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 		static int curGroupIdx = 0;
 
 		ImGui::SeparatorText("Properties");
-		if (ImGui::CollapsingHeader("Group")) {
+		if (ImGui::CollapsingHeader("Group", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::Combo("group", &curGroupIdx, groupItems, IM_ARRAYSIZE(groupItems));
 		}
 
 		const char* spriteItems[] = {"tank-image", "truck-image", "chopper-image"};
 		static int curSpriteIdx = 0;
 
-		if (ImGui::CollapsingHeader("Sprite")) {
+		if (ImGui::CollapsingHeader("Sprite", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::Combo("sprite", &curSpriteIdx, spriteItems, IM_ARRAYSIZE(spriteItems));
 		}
 
 		static int health = 100;
-		if (ImGui::CollapsingHeader("Health")) {
+		if (ImGui::CollapsingHeader("Health", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::InputInt("health", &health);
 		}
 
@@ -102,7 +102,7 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 		static int x = 0, y = 0;
 		static float scaleX = 1.0, scaleY = 1.0;
 		static float rot = 0.0;
-		if (ImGui::CollapsingHeader("Transform")) {
+		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::SliderInt("position x", &x, 0, 1920);
 			ImGui::SameLine(); HelpMarker(sliderToolTip);
 			ImGui::SliderInt("position y", &y, 0, 720);
@@ -118,7 +118,7 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 		}
 
 		static float velX = 0.0, velY = 0.0;
-		if (ImGui::CollapsingHeader("Rigid body")) {
+		if (ImGui::CollapsingHeader("Rigid body", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::SameLine(); HelpMarker(sliderToolTip);
 			ImGui::SliderFloat("velocity x", &velX, 0, 1000);
 			ImGui::SameLine(); HelpMarker(sliderToolTip);
@@ -128,7 +128,7 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 
 		static float projectileVelX = 100.0, projectileVelY = 0;
 		static int projectileFreq = 1000, projectileDuration = 2000, projectileHitDamage = 10;
-		if (ImGui::CollapsingHeader("Projectile Emitter")) {
+		if (ImGui::CollapsingHeader("Projectile Emitter", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::SliderFloat("velocity x", &projectileVelX, 0, 1000);
 			ImGui::SliderFloat("velocity y", &projectileVelY, 0, 1000);
 
