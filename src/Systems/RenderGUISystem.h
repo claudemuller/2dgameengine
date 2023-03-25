@@ -84,6 +84,7 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 		if (ImGui::CollapsingHeader("Group", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::Combo("group", &curGroupIdx, groupItems, IM_ARRAYSIZE(groupItems));
 		}
+		ImGui::Spacing();
 
 		const char* spriteItems[] = {"tank-image", "truck-image", "chopper-image"};
 		static int curSpriteIdx = 0;
@@ -91,11 +92,13 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 		if (ImGui::CollapsingHeader("Sprite", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::Combo("sprite", &curSpriteIdx, spriteItems, IM_ARRAYSIZE(spriteItems));
 		}
+		ImGui::Spacing();
 
 		static int health = 100;
 		if (ImGui::CollapsingHeader("Health", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::InputInt("health", &health);
 		}
+		ImGui::Spacing();
 
 		char *sliderToolTip = "CTRL+click to input value.";
 
@@ -113,9 +116,10 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 			ImGui::SliderFloat("scale y", &scaleY, 1, 100);
 			ImGui::SameLine(); HelpMarker(sliderToolTip);
 
-			ImGui::SliderFloat("rotation", &rot, -180, 180);
+			ImGui::SliderAngle("rotation", &rot, 0, 360);
 			ImGui::SameLine(); HelpMarker(sliderToolTip);
 		}
+		ImGui::Spacing();
 
 		static float velX = 0.0, velY = 0.0;
 		if (ImGui::CollapsingHeader("Rigid body", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -125,6 +129,7 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 			ImGui::SliderFloat("velocity y", &velY, 0, 1000);
 			ImGui::SameLine(); HelpMarker(sliderToolTip);
 		}
+		ImGui::Spacing();
 
 		static float projectileVelX = 100.0, projectileVelY = 0;
 		static int projectileFreq = 1000, projectileDuration = 2000, projectileHitDamage = 10;
@@ -136,6 +141,7 @@ void RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &ent
 			ImGui::InputInt("duration", &projectileDuration);
 			ImGui::InputInt("hit damage", &projectileHitDamage);
 		}
+		ImGui::Spacing();
 
 		if (ImGui::Button("Spawn Enemy")) {
 			Entity entity = entityManager->CreatEntity();
