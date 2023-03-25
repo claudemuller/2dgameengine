@@ -103,6 +103,9 @@ void EntityManager::GroupEntity(Entity entity, const std::string &group) {
 }
 
 bool EntityManager::EntityInGroup(Entity entity, const std::string &group) const {
+	if (entitiesByGroup.find(group) == entitiesByGroup.end()) {
+		return false;
+	}
 	auto groupEntities = entitiesByGroup.at(group);
 	return groupEntities.find(entity.GetId()) != groupEntities.end();
 }
@@ -154,7 +157,13 @@ void EntityManager::Update() {
 	for (auto entity: entitiesToBeKilled) {
 		RemoveEntityFromSystems(entity);
 		entityComponentSignatures[entity.GetId()].reset();
+
+		for (auto pool: componentPools) {
+			pool->RemoveEntityFromPool(entity.GetId());
+		}
+
 		freeIds.push_back(entity.GetId());
+
 		RemoveEntityTag(entity);
 		RemoveEntityroup(entity);
 	}

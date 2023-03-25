@@ -1,6 +1,7 @@
 #ifndef ECS_H
 #define ECS_H
 
+#include <iostream>
 #include <vector>
 #include <bitset>
 #include <unordered_map>
@@ -77,49 +78,91 @@ public:
 
 class PoolBase {
 public:
-	virtual ~PoolBase() {}
+	virtual ~PoolBase() = default;
+	virtual void RemoveEntityFromPool(size_t entityId) = 0;
 };
 
 template <typename T>
 class Pool: public PoolBase {
 private:
 	std::vector<T> data;
+	size_t size;
+
+	std::unordered_map<size_t, size_t> entityIdToIdx;
+	std::unordered_map<size_t, size_t> idxToEntityId;
 
 public:
-	Pool(int size = 100) {
-		data.resize(size);
+	Pool(size_t capacity = 100) {
+		size = 0;
+		data.resize(capacity);
 	}
 	virtual ~Pool() = default;
 
 	bool IsEmpty() const {
-		return data.empty();
+		return size == 0;
 	}
 
-	int GetSize() const {
-		return data.size();
+	size_t GetSize() const {
+		return size;
 	}
 
-	void Resize(int n) {
+	void Resize(size_t n) {
 		data.resize(n);
 	}
 
 	void Clear() {
 		data.clear();
+		size = 0;
 	}
 
 	void Add(T object) {
 		data.push_back(object);
 	}
 
-	void Set(int idx, T object) {
+	void Set(size_t entityId, T object) {
+		if (entityIdToIdx.find(entityId) != entityIdToIdx.end()) {
+			size_t idx = entityIdToIdx[entityId];
+			data[idx] = object;
+			return;
+		}
+
+		size_t idx = size;
+		entityIdToIdx.emplace(entityId, idx);
+		idxToEntityId.emplace(idx, entityId);
+
+		if (idx >= data.capacity()) data.resize(size*2);
+
 		data[idx] = object;
+		size++;
 	}
 
-	T& Get(int idx) {
+	void Remove(size_t entityId) {
+		size_t idxOfRemoved = entityIdToIdx[entityId];
+		size_t idxOfLast = size-1;
+		data[idxOfRemoved] = data[idxOfLast];
+
+		size_t entityIdOfLastElement = idxToEntityId[idxOfLast];
+		entityIdToIdx[entityIdOfLastElement] = idxOfRemoved;
+		idxToEntityId[idxOfRemoved] = entityIdOfLastElement;
+
+		entityIdToIdx.erase(entityId);
+		idxToEntityId.erase(idxOfLast);
+
+		size--;
+	}
+
+	void RemoveEntityFromPool(size_t entityId) override {
+		if (entityIdToIdx.find(entityId) != entityIdToIdx.end()) {
+			Remove(entityId);
+		}
+	}
+
+	T& Get(size_t entityId) {
+		size_t idx = entityIdToIdx[entityId];
 		return static_cast<T&>(data[idx]);
 	}
 
-	T& operator [](unsigned int idx) {
+	T& operator [](size_t idx) {
 		return data[idx];
 	}
 };
@@ -219,10 +262,6 @@ void EntityManager::AddComponent(Entity entity, TArgs&& ...args) {
 
 	std::shared_ptr<Pool<T>> componentPool = std::static_pointer_cast<Pool<T>>(componentPools[componentId]);
 
-	if (entityId >= componentPool->GetSize()) {
-		componentPool->Resize(numEntities);
-	}
-
 	T newComponent(std::forward<TArgs>(args)...);
 
 	componentPool->Set(entityId, newComponent);
@@ -235,6 +274,10 @@ template <typename T>
 void EntityManager::RemoveComponent(Entity entity) {
 	const auto componentId = Component<T>::GetId();
 	const auto entityId = entity.GetId();
+
+	std::shared_ptr<Pool<T>> componentPool = std::static_pointer_cast<Pool<T>>(componentPools[componentId]);
+	componentPool->Remove(entityId);
+
 	entityComponentSignatures[entityId].set(componentId, false);
 
 	Logger::Info("component id = " + std::to_string(componentId) + " was removed from entity id = " + std::to_string(entityId));
