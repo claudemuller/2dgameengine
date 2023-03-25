@@ -39,6 +39,11 @@ public:
 	void Kill();
 	int GetId() const;
 
+	void Tag(const std::string &tag);
+	bool HasTag(const std::string &tag) const;
+	void Group(const std::string &group);
+	bool InGroup(const std::string &group) const;
+
 	Entity& operator =(const Entity& other) = default;
 	bool operator ==(const Entity& other) const { return id == other.id; }
 	bool operator !=(const Entity& other) const { return id != other.id; }
@@ -125,9 +130,17 @@ private:
 	std::vector<std::shared_ptr<PoolBase>> componentPools;
 	std::vector<Signature> entityComponentSignatures;
 	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
+
 	std::set<Entity> entitiesToBeAdded;
 	std::set<Entity> entitiesToBeKilled;
+
 	std::deque<int> freeIds;
+
+	std::unordered_map<std::string, Entity> entityByTag;
+	std::unordered_map<int, std::string> tagByEntity;
+
+	std::unordered_map<std::string, std::set<Entity>> entitiesByGroup;
+	std::unordered_map<int, std::string> groupByEntity;
 
 public:
 	EntityManager() = default;
@@ -136,6 +149,16 @@ public:
 
 	Entity CreatEntity();
 	void KillEntity(Entity entity);
+
+	void TagEntity(Entity entity, const std::string &tag);
+	bool EntityHasTag(Entity entity, const std::string &tag) const;
+	Entity GetEntityByTag(const std::string &tag) const;
+	void RemoveEntityTag(Entity entity);
+
+	void GroupEntity(Entity entity, const std::string &group);
+	bool EntityInGroup(Entity entity, const std::string &group) const;
+	std::vector<Entity> GetEntitiesByGroup(const std::string &group) const;
+	void RemoveEntityroup(Entity entity);
 
 	template <typename T, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
 	template <typename T> void RemoveComponent(Entity entity);

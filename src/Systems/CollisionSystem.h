@@ -9,6 +9,14 @@
 #include "../Components/TransformComponent.h"
 
 class CollisionSystem : public System {
+private:
+	bool checkAABBCollision(double aX, double aY, double aW, double aH, double bX, double bY, double bW, double bH) {
+		return aX < bX + bW
+			&& aX + aW > bX
+			&& aY < bY + bH
+			&& aY + aH > bY;
+	}
+
 public:
 	CollisionSystem() {
 		RequireComponent<BoxColliderComponent>();
@@ -43,14 +51,6 @@ public:
 				}
 			}
 		}
-	}
-
-private:
-	bool checkAABBCollision(double aX, double aY, double aW, double aH, double bX, double bY, double bW, double bH) {
-		return aX < bX + bW
-			&& aX + aW > bX
-			&& aY < bY + bH
-			&& aY + aH > bY;
 	}
 };
 

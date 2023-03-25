@@ -11,6 +11,22 @@ int Entity::GetId() const {
 	return id;
 };
 
+void Entity::Tag(const std::string &tag) {
+	entityManager->TagEntity(*this, tag);
+}
+
+bool Entity::HasTag(const std::string &tag) const {
+	return entityManager->EntityHasTag(*this, tag);
+}
+
+void Entity::Group(const std::string &group) {
+	entityManager->GroupEntity(*this, group);
+}
+
+bool Entity::InGroup(const std::string &group) const {
+	return entityManager->EntityInGroup(*this, group);
+}
+
 void System::AddEntitySystem(Entity entity) {
 	entities.push_back(entity);
 }
@@ -28,7 +44,6 @@ std::vector<Entity> System::GetSystemEntities() const {
 const Signature& System::GetComponentSignature() const {
 	return componentSignature;
 }
-
 
 Entity EntityManager::CreatEntity() {
 	int entityId;
@@ -54,6 +69,61 @@ Entity EntityManager::CreatEntity() {
 
 void EntityManager::KillEntity(Entity entity) {
 	entitiesToBeKilled.insert(entity);
+}
+
+void EntityManager::TagEntity(Entity entity, const std::string &tag) {
+	entityByTag.emplace(tag, entity);
+	tagByEntity.emplace(entity.GetId(), tag);
+}
+
+bool EntityManager::EntityHasTag(Entity entity, const std::string &tag) const {
+	if (tagByEntity.find(entity.GetId()) == tagByEntity.end()) {
+		return false;
+	}
+	return entityByTag.find(tag)->second == entity;
+}
+
+Entity EntityManager::GetEntityByTag(const std::string &tag) const {
+	return entityByTag.at(tag);
+}
+
+void EntityManager::RemoveEntityTag(Entity entity) {
+	auto taggedEntity = tagByEntity.find(entity.GetId());
+	if (taggedEntity != tagByEntity.end()) {
+		auto tag = taggedEntity->second;
+		entityByTag.erase(tag);
+		tagByEntity.erase(taggedEntity);
+	}
+}
+
+void EntityManager::GroupEntity(Entity entity, const std::string &group) {
+	entitiesByGroup.emplace(group, std::set<Entity>());
+	entitiesByGroup[group].emplace(entity);
+	groupByEntity.emplace(entity.GetId(), group);
+}
+
+bool EntityManager::EntityInGroup(Entity entity, const std::string &group) const {
+	auto groupEntities = entitiesByGroup.at(group);
+	return groupEntities.find(entity.GetId()) != groupEntities.end();
+}
+
+std::vector<Entity> EntityManager::GetEntitiesByGroup(const std::string &group) const {
+	auto &setOfEntities = entitiesByGroup.at(group);
+	return std::vector<Entity>(setOfEntities.begin(), setOfEntities.end());
+}
+
+void EntityManager::RemoveEntityroup(Entity entity) {
+	auto groupedEntity = groupByEntity.find(entity.GetId());
+	if (groupedEntity != groupByEntity.end()) {
+		auto group = entitiesByGroup.find(groupedEntity->second);
+		if (group != entitiesByGroup.end()) {
+			auto entityInGroup = group->second.find(entity);
+			if (entityInGroup != group->second.end()) {
+				group->second.erase(entityInGroup);
+			}
+		}
+		groupByEntity.erase(groupedEntity);
+	}
 }
 
 void EntityManager::AddEntityToSystems(Entity entity) {
@@ -85,6 +155,8 @@ void EntityManager::Update() {
 		RemoveEntityFromSystems(entity);
 		entityComponentSignatures[entity.GetId()].reset();
 		freeIds.push_back(entity.GetId());
+		RemoveEntityTag(entity);
+		RemoveEntityroup(entity);
 	}
 	entitiesToBeKilled.clear();
 }

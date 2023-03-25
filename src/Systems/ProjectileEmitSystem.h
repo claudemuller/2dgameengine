@@ -56,7 +56,7 @@ public:
 
 					glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
 					int directionX = 0;
-					int directionY = 0;
+					int directionY = -1;
 					if (rigidBody.velocity.x > 0) directionX = +1;
 					if (rigidBody.velocity.x < 0) directionX = -1;
 					if (rigidBody.velocity.y > 0) directionY = +1;
