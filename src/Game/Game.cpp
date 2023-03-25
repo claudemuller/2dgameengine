@@ -2,6 +2,9 @@
 #include <fstream>
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdlrenderer.h>
+#include <imgui/imgui_impl_sdl2.h>
 #include "Game.h"
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
@@ -84,6 +87,14 @@ void Game::Init() {
 
 	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 	isRunning = true;
+
+	IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    // ImGui::StyleColorsDark();
+	ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer_Init(renderer);
 
 	camera.x = 0;
 	camera.y = 0;
@@ -205,6 +216,16 @@ void Game::Setup() {
 void Game::ProcessInput() {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
+		ImGui_ImplSDL2_ProcessEvent(&event);
+		ImGuiIO &io = ImGui::GetIO();
+
+		int mouseX, mouseY;
+		const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+
+		io.MousePos = ImVec2(mouseX, mouseY);
+		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
+		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+
 		switch (event.type) {
 		case SDL_QUIT:
 			isRunning = false;
@@ -252,14 +273,27 @@ void Game::Render() {
 	entityManager->GetSystem<RenderSystem>().Update(renderer, camera, assetStore);
 	entityManager->GetSystem<RenderTextSystem>().Update(renderer, camera, assetStore);
 	entityManager->GetSystem<RenderHealthBarSystem>().Update(renderer, camera, assetStore);
-	if (isDebug) entityManager->GetSystem<RenderColliderSystem>().Update(renderer, camera);
+	if (isDebug) {
+		entityManager->GetSystem<RenderColliderSystem>().Update(renderer, camera);
+
+		ImGui_ImplSDLRenderer_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
+		ImGui::Render();
+        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+	}
 
 	SDL_RenderPresent(renderer);
 }
 
 void Game::Cleanup() {
+	ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
+	// TTF_Quit();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
-	// TTF_Quit();
 	SDL_Quit();
 }
