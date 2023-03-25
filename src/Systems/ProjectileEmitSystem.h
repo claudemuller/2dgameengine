@@ -2,6 +2,7 @@
 #define PROJECTILE_EMIT_SYSTEM_H
 
 #include <SDL2/SDL.h>
+#include "../Game/Game.h"
 #include "../ECS/ECS.h"
 #include "../EventBus/EventBus.h"
 #include "../Events/KeyPressedEvent.h"
@@ -22,7 +23,7 @@ private:
 		ProjectileEmitterComponent projectileEmitter
 	) {
 		Entity projectile = entity.entityManager->CreatEntity();
-		projectile.Group("projectiles");
+		projectile.Group(Game::Groups[Game::PROJECTILES]);
 		projectile.AddComponent<TransformComponent>(projectilePos, glm::vec2(1.0, 1.0), 0.0);
 		projectile.AddComponent<RigidBodyComponent>(projectileVel);
 		projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4);

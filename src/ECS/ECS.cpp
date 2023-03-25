@@ -71,6 +71,17 @@ void EntityManager::KillEntity(Entity entity) {
 	entitiesToBeKilled.insert(entity);
 }
 
+size_t EntityManager::NumEntites() const {
+	size_t size = 0;
+	for (auto pool: componentPools) {
+		if (pool) {
+			// printf("%zu\n", pool->GetSize());
+			size += pool->GetSize();
+		}
+	}
+	return size;
+}
+
 void EntityManager::TagEntity(Entity entity, const std::string &tag) {
 	entityByTag.emplace(tag, entity);
 	tagByEntity.emplace(entity.GetId(), tag);
@@ -111,6 +122,9 @@ bool EntityManager::EntityInGroup(Entity entity, const std::string &group) const
 }
 
 std::vector<Entity> EntityManager::GetEntitiesByGroup(const std::string &group) const {
+	if (entitiesByGroup.find(group) == entitiesByGroup.end()) {
+		return std::vector<Entity>();
+	}
 	auto &setOfEntities = entitiesByGroup.at(group);
 	return std::vector<Entity>(setOfEntities.begin(), setOfEntities.end());
 }

@@ -40,6 +40,15 @@ public:
 	static int WindowHeight;
 	static int MapWidth;
 	static int MapHeight;
+
+	static const char *Groups[];
+	enum Group {
+		UI,
+		TILES,
+		PLAYER,
+		ENEMIES,
+		PROJECTILES
+	};
 };
 
 #endif // GAME_H

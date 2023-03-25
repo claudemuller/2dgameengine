@@ -20,6 +20,7 @@
 #include "../Systems/ProjectileLifecycleSystem.h"
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/RenderHealthBarSystem.h"
+#include "../Systems/RenderGUISystem.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
@@ -37,6 +38,8 @@ int Game::WindowHeight;
 int Game::MapWidth;
 int Game::MapHeight;
 
+const char *Game::Groups[] = {"ui", "tiles", "player", "enemies", "projectiles"};
+
 Game::Game() {
 	isRunning = false;
 	isDebug = false;
@@ -45,8 +48,7 @@ Game::Game() {
 	eventBus = std::make_unique<EventBus>();
 }
 
-Game::~Game() {
-}
+Game::~Game() {}
 
 void Game::Init() {
 	Logger::Log = true;
@@ -127,6 +129,7 @@ void Game::LoadLevel(int level) {
 	entityManager->AddSystem<ProjectileLifecycleSystem>();
 	entityManager->AddSystem<RenderTextSystem>();
 	entityManager->AddSystem<RenderHealthBarSystem>();
+	entityManager->AddSystem<RenderGUISystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -155,7 +158,7 @@ void Game::LoadLevel(int level) {
 			mapFile.ignore();
 
 			Entity tile = entityManager->CreatEntity();
-			tile.Group("tiles");
+			tile.Group(Game::Groups[TILES]);
 			tile.AddComponent<TransformComponent>(
 				glm::vec2(x * (tileScale*tileSize), y * (tileScale*tileSize)),
 				glm::vec2(tileScale, tileScale),
@@ -169,6 +172,7 @@ void Game::LoadLevel(int level) {
 	MapHeight = tileSize * mapNumRows * tileScale;
 
 	Entity radar = entityManager->CreatEntity();
+	radar.Group(Game::Groups[UI]);
 	radar.AddComponent<TransformComponent>(glm::vec2(WindowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
@@ -176,6 +180,7 @@ void Game::LoadLevel(int level) {
 
 	Entity chopper = entityManager->CreatEntity();
 	chopper.Tag("player");
+	chopper.Group(Game::Groups[PLAYER]);
 	chopper.AddComponent<TransformComponent>(glm::vec2(100.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
 	chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
@@ -187,7 +192,7 @@ void Game::LoadLevel(int level) {
 	chopper.AddComponent<HealthComponent>(100);
 
 	Entity tank = entityManager->CreatEntity();
-	tank.Group("enemies");
+	tank.Group(Game::Groups[ENEMIES]);
 	tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
@@ -196,7 +201,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = entityManager->CreatEntity();
-	truck.Group("enemies");
+	truck.Group(Game::Groups[ENEMIES]);
 	truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 1);
@@ -205,6 +210,7 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<HealthComponent>(100);
 
 	Entity label = entityManager->CreatEntity();
+	label.Group(Game::Groups[UI]);
 	SDL_Color green = {0, 255, 0};
 	label.AddComponent<TextLabelComponent>(glm::vec2(WindowWidth / 2 - 40, 10), "Chopper v1.0", "charriot-font-20", green);
 }
@@ -276,12 +282,7 @@ void Game::Render() {
 	if (isDebug) {
 		entityManager->GetSystem<RenderColliderSystem>().Update(renderer, camera);
 
-		ImGui_ImplSDLRenderer_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
-		ImGui::Render();
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+		entityManager->GetSystem<RenderGUISystem>().Update(entityManager);
 	}
 
 	SDL_RenderPresent(renderer);

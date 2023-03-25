@@ -80,6 +80,7 @@ class PoolBase {
 public:
 	virtual ~PoolBase() = default;
 	virtual void RemoveEntityFromPool(size_t entityId) = 0;
+	virtual size_t GetSize() = 0;
 };
 
 template <typename T>
@@ -102,7 +103,7 @@ public:
 		return size == 0;
 	}
 
-	size_t GetSize() const {
+	size_t GetSize() override {
 		return size;
 	}
 
@@ -192,6 +193,7 @@ public:
 
 	Entity CreatEntity();
 	void KillEntity(Entity entity);
+	size_t NumEntites() const;
 
 	void TagEntity(Entity entity, const std::string &tag);
 	bool EntityHasTag(Entity entity, const std::string &tag) const;
