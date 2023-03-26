@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include <sol/sol.hpp>
 #include "../ECS/ECS.h"
 #include "../AssetStore/AssetStore.h"
 #include "../EventBus/EventBus.h"
@@ -20,6 +21,8 @@ private:
 	bool isPaused;
 	int millisecsPreviousFrame;
 
+    sol::state lua;
+
 	std::unique_ptr<EntityManager> entityManager;
 	std::unique_ptr<AssetStore> assetStore;
 	std::unique_ptr<EventBus> eventBus;
@@ -30,7 +33,6 @@ public:
 
 	void Init(bool debug);
 	void Run();
-	void LoadLevel(int level);
 	void Setup();
 	void ProcessInput();
 	void Update();
