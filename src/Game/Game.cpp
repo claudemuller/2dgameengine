@@ -51,7 +51,7 @@ Game::Game() {
 Game::~Game() {}
 
 void Game::Init() {
-	Logger::Log = true;
+	Logger::Log = false;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		Logger::Err("error initing SDL");
@@ -281,8 +281,7 @@ void Game::Render() {
 	entityManager->GetSystem<RenderHealthBarSystem>().Update(renderer, camera, assetStore);
 	if (isDebug) {
 		entityManager->GetSystem<RenderColliderSystem>().Update(renderer, camera);
-
-		entityManager->GetSystem<RenderGUISystem>().Update(entityManager);
+		entityManager->GetSystem<RenderGUISystem>().Update(entityManager, camera);
 	}
 
 	SDL_RenderPresent(renderer);

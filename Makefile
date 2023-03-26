@@ -7,6 +7,7 @@ SRC=./src/*.cpp \
 	./src/Game/*.cpp \
 	./src/AssetStore/*.cpp \
 	./src/ECS/*.cpp \
+	./src/Systems/*.cpp \
 	./src/Logger/*.cpp \
 	./libs/imgui/*.cpp
 BIN=gameengine

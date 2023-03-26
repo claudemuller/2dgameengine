@@ -80,7 +80,6 @@ class PoolBase {
 public:
 	virtual ~PoolBase() = default;
 	virtual void RemoveEntityFromPool(size_t entityId) = 0;
-	virtual size_t GetSize() = 0;
 };
 
 template <typename T>
@@ -101,10 +100,6 @@ public:
 
 	bool IsEmpty() const {
 		return size == 0;
-	}
-
-	size_t GetSize() override {
-		return size;
 	}
 
 	void Resize(size_t n) {

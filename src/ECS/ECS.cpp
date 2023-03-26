@@ -72,14 +72,7 @@ void EntityManager::KillEntity(Entity entity) {
 }
 
 size_t EntityManager::NumEntites() const {
-	size_t size = 0;
-	for (auto pool: componentPools) {
-		if (pool) {
-			// printf("%zu\n", pool->GetSize());
-			size += pool->GetSize();
-		}
-	}
-	return size;
+	return numEntities;
 }
 
 void EntityManager::TagEntity(Entity entity, const std::string &tag) {
