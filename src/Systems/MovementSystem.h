@@ -69,8 +69,11 @@ public:
 				transform.position.y = transform.position.y > Game::MapHeight - paddingBottom ? Game::MapHeight - paddingBottom : transform.position.y;
 			}
 
-			bool isEntityOutsideMap = transform.position.x < 0 || transform.position.x > Game::MapWidth
-				|| transform.position.y < 0 || transform.position.y > Game::MapHeight;
+			int margin = 100;
+			bool isEntityOutsideMap = transform.position.x < -margin
+				|| transform.position.x > Game::MapWidth + margin
+				|| transform.position.y < -margin
+				|| transform.position.y > Game::MapHeight + margin;
 
 			if (isEntityOutsideMap && !entity.HasTag("player")) {
 				entity.Kill();
