@@ -44,7 +44,8 @@ public:
 	void OnKeyPressed(KeyPressedEvent& event) {
 		if (event.symbol == SDLK_SPACE) {
 			for (auto entity: GetSystemEntities()) {
-				if (entity.HasComponent<CameraFollowComponent>()) {
+				// TODO: use and maintain tags too
+				if (entity.HasTag("player")) {
 					const auto projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 					const auto transform = entity.GetComponent<TransformComponent>();
 					const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
@@ -79,17 +80,32 @@ public:
 		for (auto entity: GetSystemEntities()) {
 			auto &projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 			const auto transform = entity.GetComponent<TransformComponent>();
+			// const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
 
 			if (projectileEmitter.repeatFreq == 0) {
 				continue;
 			}
 
+			// TODO: DRY
 			if (SDL_GetTicks() - projectileEmitter.lastEmissionTime > projectileEmitter.repeatFreq) {
 				glm::vec2 projectilePosition = transform.position;
 				if (entity.HasComponent<SpriteComponent>()) {
 					auto sprite = entity.GetComponent<SpriteComponent>();
 					projectilePosition.x += transform.scale.x * sprite.width / 2;
 					projectilePosition.y += transform.scale.y * sprite.height / 2;
+
+					// glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
+					// int directionX = 0;
+					// int directionY = 0;
+					//
+					// if (rigidBody.velocity.x == 0 && rigidBody.velocity.y == 0) directionY = -1;
+					//
+					// if (rigidBody.velocity.x > 0) directionX = +1;
+					// if (rigidBody.velocity.x < 0) directionX = -1;
+					// if (rigidBody.velocity.y > 0) directionY = +1;
+					// if (rigidBody.velocity.y < 0) directionY = -1;
+					// projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
+					// projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
 				}
 
 				emitProjectile(entity, projectilePosition, projectileEmitter.projectileVelocity, projectileEmitter);

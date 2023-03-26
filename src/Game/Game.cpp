@@ -51,7 +51,7 @@ Game::Game() {
 
 Game::~Game() {}
 
-void Game::Init() {
+void Game::Init(bool debug) {
 	Logger::Log = true;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -88,7 +88,9 @@ void Game::Init() {
 		return;
 	}
 
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	if (!debug)
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
 	isRunning = true;
 
 	IMGUI_CHECKVERSION();
@@ -199,7 +201,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
 	tank.AddComponent<BoxColliderComponent>(32, 32);
-	// tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 10, false);
+	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 10, false);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = entityManager->CreatEntity();

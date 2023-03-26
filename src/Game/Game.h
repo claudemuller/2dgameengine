@@ -28,7 +28,7 @@ public:
 	Game();
 	~Game();
 
-	void Init();
+	void Init(bool debug);
 	void Run();
 	void LoadLevel(int level);
 	void Setup();

@@ -24,4 +24,4 @@ run:
 	./$(BIN)
 
 clean:
-	rm -rf $(BIN) debug
+	rm -rf $(BIN) debug*
