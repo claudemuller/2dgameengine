@@ -13,7 +13,7 @@ HelpMarker(const char* desc)
 }
 
 void
-RenderGUISystem::renderInfoOverlay(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera)
+renderInfoOverlay(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera)
 {
 	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 
@@ -43,7 +43,7 @@ RenderGUISystem::renderInfoOverlay(const std::unique_ptr<EntityManager> &entityM
 }
 
 void
-RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera)
+renderAddEnemies(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera)
 {
 	if (ImGui::Begin("Spawn Enemies", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)) {
 		ImGui::Text("Spawn enemies here by entering some values.");
@@ -57,7 +57,7 @@ RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &entityMa
 		}
 		ImGui::Spacing();
 
-		const char* spriteItems[] = {"tank-image", "truck-image", "chopper-image"};
+		const char* spriteItems[] = {"su27-texture", "truck-image", "chopper-image"};
 		static int curSpriteIdx = 0;
 
 		if (ImGui::CollapsingHeader("Sprite", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -260,7 +260,7 @@ struct ExampleAppLog {
 };
 
 void
-RenderGUISystem::renderLogs()
+renderLogs()
 {
     static ExampleAppLog log;
 

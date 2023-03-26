@@ -50,9 +50,6 @@ public:
 		Entity a = event.a;
 		Entity b = event.b;
 
-		Logger::Info("The damage system received event: "
-			   + std::to_string(a.GetId()) + " and " + std::to_string(b.GetId()));
-
 		if (a.InGroup("projectiles") && b.HasTag("player")) {
 			onProjectileHitsPlayer(a, b);
 		}

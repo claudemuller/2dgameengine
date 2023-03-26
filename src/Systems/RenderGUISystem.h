@@ -12,27 +12,26 @@
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/HealthComponent.h"
 
+void renderInfoOverlay(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera);
+void renderAddEnemies(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera);
+void renderLogs();
+
 class RenderGUISystem: public System {
-private:
-	void renderInfoOverlay(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera);
-	void renderAddEnemies(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera);
-	void renderLogs();
-
 public:
-	RenderGUISystem() = default;
+    RenderGUISystem() = default;
 
-	void Update(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera) {
-		ImGui_ImplSDLRenderer_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
+    void Update(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera) {
+	ImGui_ImplSDLRenderer_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
 
-		renderInfoOverlay(entityManager, camera);
-		renderAddEnemies(entityManager, camera);
-		renderLogs();
+	renderInfoOverlay(entityManager, camera);
+	renderAddEnemies(entityManager, camera);
+	// renderLogs();
 
-		ImGui::Render();
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-	}
+	ImGui::Render();
+	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+    }
 };
 
 #endif // RENDER_GUI_SYSTEM_H

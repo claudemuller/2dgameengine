@@ -138,7 +138,7 @@ void EntityManager::RemoveEntityroup(Entity entity) {
 
 void EntityManager::AddEntityToSystems(Entity entity) {
 	const auto entityId = entity.GetId();
-	const auto &entityComponentSignature = entityComponentSignatures[entityId];
+	auto &entityComponentSignature = entityComponentSignatures[entityId];
 
 	for (auto &system: systems) {
 		const auto& systemComponentSignature = system.second->GetComponentSignature();

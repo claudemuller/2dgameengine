@@ -52,7 +52,7 @@ public:
 	void Update(const double deltaTime) {
 		for (auto entity: GetSystemEntities()) {
 			auto &transform = entity.GetComponent<TransformComponent>();
-			const auto &rigidBody = entity.GetComponent<RigidBodyComponent>();
+			auto &rigidBody = entity.GetComponent<RigidBodyComponent>();
 			const auto sprite = entity.GetComponent<SpriteComponent>();
 
 			transform.position.x += rigidBody.velocity.x * deltaTime;
