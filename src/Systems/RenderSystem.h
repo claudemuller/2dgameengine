@@ -31,7 +31,7 @@ public:
 				|| renderableEntity.transformComponent.position.x > camera.x+camera.w
 				|| renderableEntity.transformComponent.position.y + (renderableEntity.transformComponent.scale.y*renderableEntity.spriteComponent.height) < camera.y
 				|| renderableEntity.transformComponent.position.y > camera.y+camera.h;
-			if (isEntityOutView)
+			if (isEntityOutView && !renderableEntity.spriteComponent.isFixed)
 				continue;
 
 			renderableEntities.emplace_back(renderableEntity);
