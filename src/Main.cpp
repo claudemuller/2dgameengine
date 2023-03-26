@@ -3,7 +3,7 @@
 #include "./Game/Game.h"
 
 int main(int argc, char* argv[]) {
-	bool debug = true;
+	bool debug = false;
 
 	Game game;
 
