@@ -186,7 +186,7 @@ public:
 
 	void Update();
 
-	Entity CreatEntity();
+	Entity CreateEntity();
 	void KillEntity(Entity entity);
 	size_t NumEntites() const;
 

@@ -45,7 +45,7 @@ const Signature& System::GetComponentSignature() const {
 	return componentSignature;
 }
 
-Entity EntityManager::CreatEntity() {
+Entity EntityManager::CreateEntity() {
 	int entityId;
 
 	if (freeIds.empty()) {

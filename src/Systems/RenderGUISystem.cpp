@@ -116,7 +116,7 @@ RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &entityMa
 		ImGui::Spacing();
 
 		if (ImGui::Button("Spawn Enemy")) {
-			Entity entity = entityManager->CreatEntity();
+			Entity entity = entityManager->CreateEntity();
 			entity.Group(groupItems[curGroupIdx]);
 			entity.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(scaleX, scaleY), glm::degrees(rot));
 			entity.AddComponent<RigidBodyComponent>(glm::vec2(velX, velY));

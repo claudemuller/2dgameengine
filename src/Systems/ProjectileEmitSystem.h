@@ -22,11 +22,11 @@ private:
 		glm::vec2 projectileVel,
 		ProjectileEmitterComponent projectileEmitter
 	) {
-		Entity projectile = entity.entityManager->CreatEntity();
+		Entity projectile = entity.entityManager->CreateEntity();
 		projectile.Group(Game::Groups[Game::PROJECTILES]);
 		projectile.AddComponent<TransformComponent>(projectilePos, glm::vec2(1.0, 1.0), 0.0);
 		projectile.AddComponent<RigidBodyComponent>(projectileVel);
-		projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4);
+		projectile.AddComponent<SpriteComponent>("bullet-texture", 4, 4, 4);
 		projectile.AddComponent<BoxColliderComponent>(4, 4);
 		projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
 	}
