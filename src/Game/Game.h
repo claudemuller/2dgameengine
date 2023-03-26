@@ -17,6 +17,7 @@ private:
 
 	bool isRunning;
 	bool isDebug;
+	bool isPaused;
 	int millisecsPreviousFrame;
 
 	std::unique_ptr<EntityManager> entityManager;
@@ -45,6 +46,7 @@ public:
 	enum Group {
 		UI,
 		TILES,
+		WORLD,
 		PLAYER,
 		ENEMIES,
 		PROJECTILES

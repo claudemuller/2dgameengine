@@ -27,7 +27,7 @@ public:
 	void Update(SDL_Renderer *renderer, SDL_Rect camera) {
 		for (auto entity: GetSystemEntities()) {
 			const auto transform = entity.GetComponent<TransformComponent>();
-			const auto collider = entity.GetComponent<BoxColliderComponent>();
+			const auto &collider = entity.GetComponent<BoxColliderComponent>();
 
 			SDL_Rect colliderRect = {
 				static_cast<int>(transform.position.x + collider.offset.x - camera.x),
@@ -37,6 +37,9 @@ public:
 			};
 			SDL_SetRenderDrawColor(renderer, collider.colour.r, collider.colour.g, collider.colour.b, collider.colour.a);
 			SDL_RenderDrawRect(renderer, &colliderRect);
+
+			// TODO: fix this :(
+			// collider.colour = {255, 255, 0, 255};
 		}
 	}
 };

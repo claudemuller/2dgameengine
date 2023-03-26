@@ -38,11 +38,12 @@ int Game::WindowHeight;
 int Game::MapWidth;
 int Game::MapHeight;
 
-const char *Game::Groups[] = {"ui", "tiles", "player", "enemies", "projectiles"};
+const char *Game::Groups[] = {"ui", "tiles", "world", "player", "enemies", "projectiles"};
 
 Game::Game() {
 	isRunning = false;
 	isDebug = false;
+	isPaused = false;
 	entityManager = std::make_unique<EntityManager>();
 	assetStore = std::make_unique<AssetStore>();
 	eventBus = std::make_unique<EventBus>();
@@ -133,6 +134,7 @@ void Game::LoadLevel(int level) {
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+	assetStore->AddTexture(renderer, "tree-image", "./assets/images/tree.png");
 	assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
 	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
@@ -193,11 +195,11 @@ void Game::LoadLevel(int level) {
 
 	Entity tank = entityManager->CreatEntity();
 	tank.Group(Game::Groups[ENEMIES]);
-	tank.AddComponent<TransformComponent>(glm::vec2(450.0, 400.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+	tank.AddComponent<TransformComponent>(glm::vec2(450.0, 490.0), glm::vec2(1.0, 1.0), 0.0);
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 2);
 	tank.AddComponent<BoxColliderComponent>(32, 32);
-	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 10, false);
+	// tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 10, false);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = entityManager->CreatEntity();
@@ -208,6 +210,20 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<BoxColliderComponent>(32, 32);
 	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 5000, 10, false);
 	truck.AddComponent<HealthComponent>(100);
+
+	Entity treeA = entityManager->CreatEntity();
+	treeA.Group(Game::Groups[WORLD]);
+	treeA.AddComponent<TransformComponent>(glm::vec2(600.0, 490.0), glm::vec2(1.0, 1.0), 0.0);
+	treeA.AddComponent<RigidBodyComponent>(glm::vec2(0));
+	treeA.AddComponent<SpriteComponent>("tree-image", 16, 32, 2);
+	treeA.AddComponent<BoxColliderComponent>(16, 32);
+
+	Entity treeB = entityManager->CreatEntity();
+	treeB.Group(Game::Groups[WORLD]);
+	treeB.AddComponent<TransformComponent>(glm::vec2(400.0, 490.0), glm::vec2(1.0, 1.0), 0.0);
+	treeB.AddComponent<RigidBodyComponent>(glm::vec2(0));
+	treeB.AddComponent<SpriteComponent>("tree-image", 16, 32, 2);
+	treeB.AddComponent<BoxColliderComponent>(16, 32);
 
 	Entity label = entityManager->CreatEntity();
 	label.Group(Game::Groups[UI]);
@@ -243,6 +259,9 @@ void Game::ProcessInput() {
 			if (event.key.keysym.sym == SDLK_F1) {
 				isDebug = !isDebug;
 			}
+			if (event.key.keysym.sym == SDLK_p) {
+				isPaused = !isPaused;
+			}
 			eventBus->EmitEvent<KeyPressedEvent>(event.key.keysym.sym);
 			break;
 		}
@@ -256,11 +275,15 @@ void Game::Update() {
 	double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
 	millisecsPreviousFrame = SDL_GetTicks();
 
+	if (isPaused)
+		return;
+
 	eventBus->Reset();
 	entityManager->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
 	entityManager->GetSystem<RenderColliderSystem>().SubscribeToEvents(eventBus);
 	entityManager->GetSystem<KeyboardControlSystem>().SubscribeToEvents(eventBus);
 	entityManager->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventBus);
+	entityManager->GetSystem<MovementSystem>().SubscribeToEvents(eventBus);
 
 	entityManager->Update();
 

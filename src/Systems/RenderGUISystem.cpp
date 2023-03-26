@@ -48,7 +48,7 @@ RenderGUISystem::renderAddEnemies(const std::unique_ptr<EntityManager> &entityMa
 	if (ImGui::Begin("Spawn Enemies", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)) {
 		ImGui::Text("Spawn enemies here by entering some values.");
 
-		const char* groupItems[] = {"ui", "player", "enemies", "tiles", "projectiles"};
+		const char* groupItems[] = {"ui", "player", "enemies", "projectiles", "tiles", "world"};
 		static int curGroupIdx = 2;
 
 		ImGui::SeparatorText("Properties");
