@@ -51,7 +51,7 @@ Game::Game() {
 Game::~Game() {}
 
 void Game::Init() {
-	Logger::Log = false;
+	Logger::Log = true;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		Logger::Err("error initing SDL");

@@ -16,6 +16,7 @@ class RenderGUISystem: public System {
 private:
 	void renderInfoOverlay(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera);
 	void renderAddEnemies(const std::unique_ptr<EntityManager> &entityManager, SDL_Rect &camera);
+	void renderLogs();
 
 public:
 	RenderGUISystem() = default;
@@ -27,6 +28,7 @@ public:
 
 		renderInfoOverlay(entityManager, camera);
 		renderAddEnemies(entityManager, camera);
+		renderLogs();
 
 		ImGui::Render();
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
