@@ -13,6 +13,43 @@
 #include "../Components/TextLabelComponent.h"
 #include "../Components/ScriptComponent.h"
 
+class CSVRow
+{
+    public:
+        std::string_view operator[](std::size_t index) const
+        {
+            return std::string_view(&m_line[m_data[index] + 1], m_data[index + 1] -  (m_data[index] + 1));
+        }
+        std::size_t size() const
+        {
+            return m_data.size() - 1;
+        }
+        void readNextRow(std::istream& str)
+        {
+            std::getline(str, m_line);
+
+            m_data.clear();
+            m_data.emplace_back(-1);
+            std::string::size_type pos = 0;
+            while((pos = m_line.find(',', pos)) != std::string::npos)
+            {
+                m_data.emplace_back(pos);
+                ++pos;
+            }
+            // This checks for a trailing comma with no data after it.
+            pos   = m_line.size();
+            m_data.emplace_back(pos);
+        }
+    private:
+        std::string         m_line;
+        std::vector<int>    m_data;
+};
+std::istream& operator>>(std::istream& str, CSVRow& data)
+{
+    data.readNextRow(str);
+    return str;
+}
+
 LevelLoader::LevelLoader() {
 
 }
@@ -29,7 +66,8 @@ LevelLoader::LoadLevel(
     SDL_Renderer *renderer,
     const int levelNum
 ) {
-    std::string levelScriptName = "./assets/scripts/Level" + std::to_string(levelNum) + ".lua";
+    std::string levelScriptName = "./assets/scripts/generic.lua";
+    // std::string levelScriptName = "./assets/scripts/Level" + std::to_string(levelNum) + ".lua";
     sol::load_result script = lua.load_file(levelScriptName);
     if (!script.valid()) {
 	sol::error err = script;
@@ -73,23 +111,39 @@ LevelLoader::LoadLevel(
     int mapNumCols = map["num_cols"];
     int tileSize = map["tile_size"];
     double mapScale = map["scale"];
-    std::fstream mapFile;
-    mapFile.open(mapFilePath);
-    for (int y = 0; y < mapNumRows; y++) {
-        for (int x = 0; x < mapNumCols; x++) {
-            char ch;
-            mapFile.get(ch);
-            int srcRectY = std::atoi(&ch) * tileSize;
-            mapFile.get(ch);
-            int srcRectX = std::atoi(&ch) * tileSize;
-            mapFile.ignore();
+
+    std::ifstream file(mapFilePath);
+    CSVRow row;
+    int y = 0;
+    while(file >> row) {
+        for (int x = 0; x < row.size(); x++) {
+            std::string s = static_cast<std::string>(row[x]);
 
             Entity tile = entityManager->CreateEntity();
-            tile.AddComponent<TransformComponent>(glm::vec2(x * (mapScale * tileSize), y * (mapScale * tileSize)), glm::vec2(mapScale, mapScale), 0.0);
+
+            tile.AddComponent<TransformComponent>(
+                glm::vec2(x * (mapScale * tileSize), y * (mapScale * tileSize)),
+                glm::vec2(mapScale, mapScale),
+                0.0
+            );
+
+            int tilemapX = std::atoi(s.c_str()) % 30;
+            int tilemapY = std::atoi(s.c_str()) / 30;
+            int srcRectX = tilemapX * tileSize;
+            int srcRectY = tilemapY * tileSize;
+
+            std::cout << "map:" << x << ":" << y << std::endl;
+            std::cout << "tilemap-val:" << std::atoi(s.c_str()) << std::endl;
+            std::cout << "tilemap:" << tilemapX << ":" << tilemapY << std::endl;
+            std::cout << srcRectX << ":" << srcRectY << std::endl;
+
             tile.AddComponent<SpriteComponent>(mapTextureAssetId, tileSize, tileSize, 0, false, srcRectX, srcRectY);
-        }
+         }
+        y++;
     }
-    mapFile.close();
+
+    file.close();
+
     Game::MapWidth = mapNumCols * tileSize * mapScale;
     Game::MapHeight = mapNumRows * tileSize * mapScale;
 
